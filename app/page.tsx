@@ -24,8 +24,8 @@ export default function Dashboard() {
 
       <main className="t-dashboard-main max-w-5xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="t-dashboard-header flex items-center justify-between mb-6">
-          <div className="t-dashboard-header-left">
+        <div className="t-dashboard-header flex items-center justify-center sm:justify-between mb-6">
+          <div className="t-dashboard-header-left text-center sm:text-left">
             <h1 className="t-dashboard-title text-2xl font-bold text-gray-900">
               {state.username ? `Hi, ${state.username} 👋` : "Dashboard"}
             </h1>
@@ -37,7 +37,7 @@ export default function Dashboard() {
           </div>
           <Link
             href="/goals/create"
-            className="t-dashboard-new-goal-btn bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            className="t-dashboard-new-goal-btn hidden sm:block bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
           >
             + New Goal
           </Link>
