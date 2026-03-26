@@ -6,6 +6,7 @@ import {
   getMonthlyTarget,
   getWeeklyTarget,
   progressPercent,
+  expectedByToday,
   daysRemaining,
   alreadyLoggedToday,
   today,
@@ -27,6 +28,7 @@ export default function GoalCard({ goal }: Props) {
   const monthly = getMonthlyTarget(goal.dailyTarget, goal.difficulty);
   const weekly = getWeeklyTarget(goal.dailyTarget, goal.difficulty);
   const percent = progressPercent(goal);
+  const expectedPercent = Math.min(100, Math.round((expectedByToday(goal) / monthly) * 100));
   const remaining = daysRemaining(goal.endDate);
   const loggedToday = alreadyLoggedToday(goal);
   const todayLog = goal.logs.find((l) => l.date === today());
@@ -54,6 +56,7 @@ export default function GoalCard({ goal }: Props) {
           value={percent}
           color={percent >= 100 ? "green" : goal.status === "failed" ? "red" : "sky"}
           label="Monthly progress"
+          expectedAt={goal.status === "active" ? expectedPercent : undefined}
         />
 
         {/* Stats row */}

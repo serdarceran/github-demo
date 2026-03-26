@@ -104,7 +104,12 @@ export default function GoalDetailPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
           <h2 className="font-semibold text-gray-800">Progress Overview</h2>
 
-          <ProgressBar value={percent} label="Monthly progress" color={percent >= 100 ? "green" : "sky"} />
+          <ProgressBar
+            value={percent}
+            label="Monthly progress"
+            color={percent >= 100 ? "green" : "sky"}
+            expectedAt={goal.status === "active" ? Math.min(100, Math.round((expected / monthly) * 100)) : undefined}
+          />
           <ProgressBar value={weeklyPercent} label="vs Weekly target" color="amber" />
 
           <div className="grid grid-cols-2 gap-3 mt-2">

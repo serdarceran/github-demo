@@ -4,6 +4,7 @@ interface Props {
   size?: "sm" | "md";
   label?: string;
   showPercent?: boolean;
+  expectedAt?: number; // 0-100, shows a marker where progress should be by now
 }
 
 const colorMap = {
@@ -19,10 +20,14 @@ export default function ProgressBar({
   size = "md",
   label,
   showPercent = true,
+  expectedAt,
 }: Props) {
   const clamped = Math.min(100, Math.max(0, value));
   const bar = colorMap[color];
   const height = size === "sm" ? "h-1.5" : "h-2.5";
+  const expectedClamped = expectedAt !== undefined
+    ? Math.min(100, Math.max(0, expectedAt))
+    : undefined;
 
   return (
     <div className="w-full">
@@ -34,11 +39,18 @@ export default function ProgressBar({
           )}
         </div>
       )}
-      <div className={`w-full bg-gray-200 rounded-full ${height} overflow-hidden`}>
+      <div className={`w-full bg-gray-200 rounded-full ${height} overflow-hidden relative`}>
         <div
           className={`${bar} ${height} rounded-full transition-all duration-500`}
           style={{ width: `${clamped}%` }}
         />
+        {expectedClamped !== undefined && (
+          <div
+            className="absolute top-0 bottom-0 w-0.5 bg-gray-500 opacity-70"
+            style={{ left: `${expectedClamped}%`, transform: "translateX(-50%)" }}
+            title={`Expected: ${Math.round(expectedClamped)}%`}
+          />
+        )}
       </div>
     </div>
   );
