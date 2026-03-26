@@ -39,17 +39,31 @@ export default function ProgressBar({
           )}
         </div>
       )}
-      <div className={`t-progress-bar-track w-full bg-gray-200 rounded-full ${height} overflow-hidden relative`}>
+      <div className={`t-progress-bar-track w-full bg-gray-200 rounded-full ${height} overflow-visible relative`}>
         <div
           className={`t-progress-bar-fill ${bar} ${height} rounded-full transition-all duration-500`}
           style={{ width: `${clamped}%` }}
         />
         {expectedClamped !== undefined && (
           <div
-            className="t-progress-bar-expected-marker absolute top-0 bottom-0 w-0.5 bg-gray-500 opacity-70"
-            style={{ left: `${expectedClamped}%`, transform: "translateX(-50%)" }}
+            className="t-progress-bar-expected-marker absolute top-1/2 -translate-y-1/2"
+            style={{ left: `${expectedClamped}%`, transform: "translateX(-50%) translateY(-50%)" }}
             title={`Expected: ${Math.round(expectedClamped)}%`}
-          />
+          >
+            {/* tick line — extends above and below the track */}
+            <div className="absolute left-1/2 -translate-x-1/2 w-0.5 bg-gray-600 rounded-full"
+              style={{ top: "-5px", height: "calc(100% + 10px)", position: "absolute" }}
+            />
+            {/* downward triangle above the track */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2"
+              style={{ top: "-10px" }}
+            >
+              <svg width="8" height="6" viewBox="0 0 8 6" className="block">
+                <polygon points="4,6 0,0 8,0" className="fill-gray-600" />
+              </svg>
+            </div>
+          </div>
         )}
       </div>
     </div>
