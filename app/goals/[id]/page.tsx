@@ -69,8 +69,20 @@ export default function GoalDetailPage() {
       <Navbar username={state.username} />
       <main className="t-detail-main max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Back */}
-        <button onClick={() => router.push("/")} className="t-detail-back-btn text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1">
-          ← Back
+        <button
+          onClick={() => router.push("/")}
+          className="t-detail-back-btn inline-flex items-center gap-1.5 text-sm font-medium text-gray-400 hover:text-sky-600 transition-colors group"
+        >
+          <svg
+            className="w-4 h-4 transition-transform duration-150 group-hover:-translate-x-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
         </button>
 
         {/* Title & status */}
