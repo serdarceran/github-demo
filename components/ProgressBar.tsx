@@ -30,23 +30,23 @@ export default function ProgressBar({
     : undefined;
 
   return (
-    <div className="w-full">
+    <div className="t-progress-bar w-full">
       {(label || showPercent) && (
-        <div className="flex justify-between items-center mb-1">
-          {label && <span className="text-xs text-gray-500">{label}</span>}
+        <div className="t-progress-bar-header flex justify-between items-center mb-1">
+          {label && <span className="t-progress-bar-label text-xs text-gray-500">{label}</span>}
           {showPercent && (
-            <span className="text-xs font-medium text-gray-700 ml-auto">{clamped}%</span>
+            <span className="t-progress-bar-percent text-xs font-medium text-gray-700 ml-auto">{clamped}%</span>
           )}
         </div>
       )}
-      <div className={`w-full bg-gray-200 rounded-full ${height} overflow-hidden relative`}>
+      <div className={`t-progress-bar-track w-full bg-gray-200 rounded-full ${height} overflow-hidden relative`}>
         <div
-          className={`${bar} ${height} rounded-full transition-all duration-500`}
+          className={`t-progress-bar-fill ${bar} ${height} rounded-full transition-all duration-500`}
           style={{ width: `${clamped}%` }}
         />
         {expectedClamped !== undefined && (
           <div
-            className="absolute top-0 bottom-0 w-0.5 bg-gray-500 opacity-70"
+            className="t-progress-bar-expected-marker absolute top-0 bottom-0 w-0.5 bg-gray-500 opacity-70"
             style={{ left: `${expectedClamped}%`, transform: "translateX(-50%)" }}
             title={`Expected: ${Math.round(expectedClamped)}%`}
           />

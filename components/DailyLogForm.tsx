@@ -20,7 +20,7 @@ export default function DailyLogForm({ goal, onLog }: Props) {
 
   if (goal.status !== "active") {
     return (
-      <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-500 text-center">
+      <div className="t-log-form-inactive bg-gray-50 rounded-xl p-4 text-sm text-gray-500 text-center">
         This goal is no longer active.
       </div>
     );
@@ -42,12 +42,12 @@ export default function DailyLogForm({ goal, onLog }: Props) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <h3 className="font-semibold text-gray-800 mb-1">Log Today&apos;s Progress</h3>
+    <div className="t-log-form-card bg-white rounded-xl border border-gray-200 p-5">
+      <h3 className="t-log-form-title font-semibold text-gray-800 mb-1">Log Today&apos;s Progress</h3>
 
       {/* Today's status banner */}
       {loggedToday && (
-        <div className={`mb-3 text-xs px-3 py-2 rounded-lg ${todayMet ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+        <div className={`t-log-form-status-banner mb-3 text-xs px-3 py-2 rounded-lg ${todayMet ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
           {todayMet
             ? <>✅ <strong>{todayLog?.value} {goal.unit}</strong> logged today — target met! Add more below.</>
             : <>⚠️ <strong>{todayLog?.value} {goal.unit}</strong> logged — need <strong>{todayLog?.required}</strong> total. Keep adding!</>
@@ -56,18 +56,18 @@ export default function DailyLogForm({ goal, onLog }: Props) {
       )}
 
       {!loggedToday && isPenaltyDay && (
-        <div className="mb-3 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-lg">
+        <div className="t-log-form-penalty-banner mb-3 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-lg">
           ⚠️ <strong>Penalty day!</strong> You missed yesterday — today requires{" "}
           <strong>{requiredToday} {goal.unit}</strong> (2× normal).
         </div>
       )}
       {!loggedToday && !isPenaltyDay && (
-        <p className="text-sm text-gray-500 mb-3">
+        <p className="t-log-form-target text-sm text-gray-500 mb-3">
           Target: <strong>{requiredToday} {goal.unit}</strong>
         </p>
       )}
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form onSubmit={handleSubmit} className="t-log-form flex gap-2">
         <input
           type="number"
           min="1"
@@ -75,16 +75,16 @@ export default function DailyLogForm({ goal, onLog }: Props) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={`Add ${goal.unit}…`}
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+          className="t-log-form-input flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
         />
         <button
           type="submit"
-          className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="t-log-form-submit bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
           {loggedToday ? "Add" : "Log"}
         </button>
       </form>
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="t-log-form-error text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 }

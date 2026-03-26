@@ -39,28 +39,28 @@ export default function GoalCard({ goal }: Props) {
   const isPenaltyDay = goal.nextDayMultiplier === 2;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
+    <div className="t-goal-card bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
       {/* Header — always visible, tap to collapse on mobile */}
-      <div className="flex items-center justify-between gap-3 p-5 sm:pb-0">
-        <Link href={`/goals/${goal.id}`} className="flex-1 min-w-0">
-          <div>
-            <h3 className="font-semibold text-gray-900 text-base leading-tight truncate">{goal.name}</h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+      <div className="t-goal-card-header flex items-center justify-between gap-3 p-5 sm:pb-0">
+        <Link href={`/goals/${goal.id}`} className="t-goal-card-title-link flex-1 min-w-0">
+          <div className="t-goal-card-title-area">
+            <h3 className="t-goal-card-title font-semibold text-gray-900 text-base leading-tight truncate">{goal.name}</h3>
+            <p className="t-goal-card-subtitle text-xs text-gray-400 mt-0.5">
               {goal.unit} · {DIFFICULTY_LABELS[goal.difficulty]}
             </p>
           </div>
         </Link>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[goal.status]}`}>
+        <div className="t-goal-card-header-actions flex items-center gap-2 shrink-0">
+          <span className={`t-goal-card-status text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[goal.status]}`}>
             {goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
           </span>
           <button
-            className="sm:hidden p-1 text-gray-400 hover:text-gray-600 transition-colors"
+            className="t-goal-card-collapse-btn sm:hidden p-1 text-gray-400 hover:text-gray-600 transition-colors"
             onClick={() => setCollapsed((c) => !c)}
             aria-label={collapsed ? "Expand" : "Collapse"}
           >
             <svg
-              className={`w-4 h-4 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`}
+              className={`t-goal-card-chevron w-4 h-4 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`}
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -73,8 +73,8 @@ export default function GoalCard({ goal }: Props) {
       </div>
 
       {/* Collapsible details */}
-      <Link href={`/goals/${goal.id}`} className={`block px-5 pb-5 cursor-pointer ${collapsed ? "hidden sm:block" : "block"}`}>
-        <div className="pt-3">
+      <Link href={`/goals/${goal.id}`} className={`t-goal-card-details-link block px-5 pb-5 cursor-pointer ${collapsed ? "hidden sm:block" : "block"}`}>
+        <div className="t-goal-card-details pt-3">
           {/* Progress bar */}
           <ProgressBar
             value={percent}
@@ -84,7 +84,7 @@ export default function GoalCard({ goal }: Props) {
           />
 
           {/* Stats row */}
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div className="t-goal-card-stats mt-3 grid grid-cols-3 gap-2 text-center">
             <Stat label="Done" value={`${goal.cumulativeTotal}`} unit={goal.unit} />
             <Stat label="Monthly" value={`${monthly}`} unit={goal.unit} />
             <Stat label="Days left" value={`${remaining}`} unit="d" />
@@ -93,7 +93,7 @@ export default function GoalCard({ goal }: Props) {
           {/* Today status */}
           {goal.status === "active" && (
             <div
-              className={`mt-3 text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 ${
+              className={`t-goal-card-today-status mt-3 text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 ${
                 loggedToday && todayLog && todayLog.value >= todayLog.required
                   ? "bg-emerald-50 text-emerald-700"
                   : loggedToday || isPenaltyDay
@@ -115,7 +115,7 @@ export default function GoalCard({ goal }: Props) {
 
           {/* Streak */}
           {goal.streak > 0 && (
-            <div className="mt-2 text-xs text-amber-600 font-medium">🔥 {goal.streak}-day streak</div>
+            <div className="t-goal-card-streak mt-2 text-xs text-amber-600 font-medium">🔥 {goal.streak}-day streak</div>
           )}
         </div>
       </Link>
@@ -125,10 +125,10 @@ export default function GoalCard({ goal }: Props) {
 
 function Stat({ label, value, unit }: { label: string; value: string; unit: string }) {
   return (
-    <div className="bg-gray-50 rounded-lg px-2 py-1.5">
-      <div className="text-xs text-gray-400">{label}</div>
-      <div className="font-semibold text-gray-800 text-sm">
-        {value} <span className="font-normal text-gray-400 text-xs">{unit}</span>
+    <div className="t-goal-card-stat bg-gray-50 rounded-lg px-2 py-1.5">
+      <div className="t-goal-card-stat-label text-xs text-gray-400">{label}</div>
+      <div className="t-goal-card-stat-value font-semibold text-gray-800 text-sm">
+        {value} <span className="t-goal-card-stat-unit font-normal text-gray-400 text-xs">{unit}</span>
       </div>
     </div>
   );

@@ -25,8 +25,8 @@ export default function GoalDetailPage() {
 
   if (!hydrated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-gray-400 text-sm">Loading…</div>
+      <div className="t-detail-loading min-h-screen flex items-center justify-center">
+        <div className="t-detail-loading-text animate-pulse text-gray-400 text-sm">Loading…</div>
       </div>
     );
   }
@@ -37,9 +37,9 @@ export default function GoalDetailPage() {
     return (
       <>
         <Navbar username={state.username} />
-        <main className="max-w-2xl mx-auto px-4 py-16 text-center">
-          <p className="text-gray-400">Goal not found.</p>
-          <button onClick={() => router.push("/")} className="mt-4 text-sky-600 text-sm underline">
+        <main className="t-detail-not-found-main max-w-2xl mx-auto px-4 py-16 text-center">
+          <p className="t-detail-not-found-text text-gray-400">Goal not found.</p>
+          <button onClick={() => router.push("/")} className="t-detail-not-found-back mt-4 text-sky-600 text-sm underline">
             Back to dashboard
           </button>
         </main>
@@ -67,17 +67,17 @@ export default function GoalDetailPage() {
   return (
     <>
       <Navbar username={state.username} />
-      <main className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+      <main className="t-detail-main max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Back */}
-        <button onClick={() => router.push("/")} className="text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1">
+        <button onClick={() => router.push("/")} className="t-detail-back-btn text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1">
           ← Back
         </button>
 
         {/* Title & status */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{goal.name}</h1>
-            <p className="text-sm text-gray-400 mt-0.5">
+        <div className="t-detail-header flex items-start justify-between gap-4">
+          <div className="t-detail-header-left">
+            <h1 className="t-detail-title text-2xl font-bold text-gray-900">{goal.name}</h1>
+            <p className="t-detail-meta text-sm text-gray-400 mt-0.5">
               {goal.unit} · {DIFFICULTY_LABELS[goal.difficulty]} · {goal.startDate} – {goal.endDate}
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function GoalDetailPage() {
 
         {/* Failed notice */}
         {goal.status === "failed" && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+          <div className="t-detail-failed-notice bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
             ❌ This goal was marked as <strong>failed</strong>.{" "}
             {net < 0
               ? "Your cumulative debt exceeded your progress."
@@ -101,8 +101,8 @@ export default function GoalDetailPage() {
         <DailyLogForm goal={goal} onLog={(v) => logProgress(goal.id, v)} />
 
         {/* Progress cards */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-          <h2 className="font-semibold text-gray-800">Progress Overview</h2>
+        <div className="t-detail-progress-card bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+          <h2 className="t-detail-progress-title font-semibold text-gray-800">Progress Overview</h2>
 
           <ProgressBar
             value={percent}
@@ -112,7 +112,7 @@ export default function GoalDetailPage() {
           />
           <ProgressBar value={weeklyPercent} label="vs Weekly target" color="amber" />
 
-          <div className="grid grid-cols-2 gap-3 mt-2">
+          <div className="t-detail-stats-grid grid grid-cols-2 gap-3 mt-2">
             <StatBox label="Logged" value={goal.cumulativeTotal} unit={goal.unit} />
             <StatBox label="Monthly target" value={monthly} unit={goal.unit} />
             <StatBox label="Days elapsed" value={elapsed} unit={`/ ${totalDays}`} />
@@ -127,24 +127,24 @@ export default function GoalDetailPage() {
           </div>
 
           {goal.streak > 0 && (
-            <div className="text-sm text-amber-600 font-medium mt-1">🔥 {goal.streak}-day streak</div>
+            <div className="t-detail-streak text-sm text-amber-600 font-medium mt-1">🔥 {goal.streak}-day streak</div>
           )}
         </div>
 
         {/* Daily log history */}
         {goal.logs.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 className="font-semibold text-gray-800 mb-4">Log History</h2>
-            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+          <div className="t-detail-history-card bg-white rounded-xl border border-gray-200 p-5">
+            <h2 className="t-detail-history-title font-semibold text-gray-800 mb-4">Log History</h2>
+            <div className="t-detail-history-list space-y-2 max-h-72 overflow-y-auto pr-1">
               {[...goal.logs].reverse().map((log) => (
                 <div
                   key={log.date}
-                  className={`flex items-center justify-between text-sm px-3 py-2 rounded-lg ${
+                  className={`t-detail-history-entry flex items-center justify-between text-sm px-3 py-2 rounded-lg ${
                     log.missed ? "bg-red-50" : "bg-emerald-50"
                   }`}
                 >
-                  <span className="text-gray-600">{log.date}</span>
-                  <span className={`font-medium ${log.missed ? "text-red-600" : "text-emerald-700"}`}>
+                  <span className="t-detail-history-date text-gray-600">{log.date}</span>
+                  <span className={`t-detail-history-value font-medium ${log.missed ? "text-red-600" : "text-emerald-700"}`}>
                     {log.missed ? "⚠️" : "✅"} {log.value} / {log.required} {goal.unit}
                   </span>
                 </div>
@@ -154,10 +154,10 @@ export default function GoalDetailPage() {
         )}
 
         {/* Delete */}
-        <div className="pt-2">
+        <div className="t-detail-delete-section pt-2">
           <button
             onClick={handleDelete}
-            className="text-sm text-red-400 hover:text-red-600 underline"
+            className="t-detail-delete-btn text-sm text-red-400 hover:text-red-600 underline"
           >
             Delete this goal
           </button>
@@ -174,7 +174,7 @@ function StatusBadge({ status }: { status: string }) {
     failed: "bg-red-100 text-red-700",
   };
   return (
-    <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${map[status] ?? ""}`}>
+    <span className={`t-detail-status-badge text-xs px-2.5 py-1 rounded-full font-semibold ${map[status] ?? ""}`}>
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -192,10 +192,10 @@ function StatBox({
   highlight?: boolean;
 }) {
   return (
-    <div className={`rounded-lg px-3 py-2.5 ${highlight ? "bg-red-50" : "bg-gray-50"}`}>
-      <div className="text-xs text-gray-400">{label}</div>
-      <div className={`font-semibold text-sm ${highlight ? "text-red-600" : "text-gray-800"}`}>
-        {value} <span className="font-normal text-gray-400 text-xs">{unit}</span>
+    <div className={`t-detail-stat-box rounded-lg px-3 py-2.5 ${highlight ? "bg-red-50" : "bg-gray-50"}`}>
+      <div className="t-detail-stat-box-label text-xs text-gray-400">{label}</div>
+      <div className={`t-detail-stat-box-value font-semibold text-sm ${highlight ? "text-red-600" : "text-gray-800"}`}>
+        {value} <span className="t-detail-stat-box-unit font-normal text-gray-400 text-xs">{unit}</span>
       </div>
     </div>
   );

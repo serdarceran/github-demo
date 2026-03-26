@@ -73,17 +73,17 @@ export default function CreateGoalPage() {
   return (
     <>
       <Navbar username={state.username} />
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Create a New Goal</h1>
+      <main className="t-create-main max-w-2xl mx-auto px-4 py-8">
+        <h1 className="t-create-title text-2xl font-bold text-gray-900 mb-6">Create a New Goal</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="t-create-form space-y-5">
           <Field label="Goal Name" error={errors.name}>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Read books"
-              className="input"
+              className="t-create-field-input-name input"
             />
           </Field>
 
@@ -93,7 +93,7 @@ export default function CreateGoalPage() {
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
               placeholder="e.g. pages, minutes, km"
-              className="input"
+              className="t-create-field-input-unit input"
             />
           </Field>
 
@@ -104,27 +104,27 @@ export default function CreateGoalPage() {
               value={dailyTarget}
               onChange={(e) => setDailyTarget(e.target.value)}
               placeholder="e.g. 20"
-              className="input"
+              className="t-create-field-input-daily-target input"
             />
           </Field>
 
           {/* Difficulty selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="t-create-difficulty-section">
+            <label className="t-create-difficulty-label block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
+            <div className="t-create-difficulty-grid grid grid-cols-3 gap-2">
               {difficulties.map((d) => (
                 <button
                   type="button"
                   key={d}
                   onClick={() => setDifficulty(d)}
-                  className={`py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                  className={`t-create-difficulty-btn-${d} py-2.5 px-3 rounded-lg border text-sm font-medium transition-colors ${
                     difficulty === d
                       ? "border-sky-500 bg-sky-50 text-sky-700"
                       : "border-gray-200 text-gray-600 hover:border-gray-300"
                   }`}
                 >
                   {DIFFICULTY_LABELS[d]}
-                  <span className="block text-xs font-normal opacity-60">
+                  <span className="t-create-difficulty-multiplier block text-xs font-normal opacity-60">
                     ×{DIFFICULTY_MULTIPLIERS[d]}
                   </span>
                 </button>
@@ -138,31 +138,31 @@ export default function CreateGoalPage() {
               value={badgeName}
               onChange={(e) => setBadgeName(e.target.value)}
               placeholder="e.g. Bookworm, Iron Runner"
-              className="input"
+              className="t-create-field-input-badge-name input"
             />
           </Field>
 
           {/* Preview */}
           {daily > 0 && (
-            <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 text-sm space-y-1.5">
-              <p className="font-semibold text-sky-800 mb-2">Calculated Targets</p>
+            <div className="t-create-preview bg-sky-50 border border-sky-200 rounded-xl p-4 text-sm space-y-1.5">
+              <p className="t-create-preview-title font-semibold text-sky-800 mb-2">Calculated Targets</p>
               <Row label="Daily target" value={`${daily} ${unit || "units"}`} />
               <Row label="Weekly target" value={`${weekly} ${unit || "units"}`} />
               <Row label="Monthly target" value={`${monthly} ${unit || "units"}`} />
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="t-create-actions flex gap-3 pt-2">
             <button
               type="button"
               onClick={() => router.back()}
-              className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+              className="t-create-cancel-btn flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 bg-sky-600 hover:bg-sky-700 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors"
+              className="t-create-submit-btn flex-1 bg-sky-600 hover:bg-sky-700 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors"
             >
               Create Goal
             </button>
@@ -199,19 +199,19 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+    <div className="t-create-field">
+      <label className="t-create-field-label block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
       {children}
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="t-create-field-error text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 }
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between">
-      <span className="text-sky-700">{label}</span>
-      <span className="font-semibold text-sky-900">{value}</span>
+    <div className="t-create-preview-row flex justify-between">
+      <span className="t-create-preview-row-label text-sky-700">{label}</span>
+      <span className="t-create-preview-row-value font-semibold text-sky-900">{value}</span>
     </div>
   );
 }
