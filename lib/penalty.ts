@@ -45,8 +45,11 @@ export function applyMissedDays(goal: Goal): Goal {
   const loggedDates = new Set(goal.logs.map((l) => l.date));
   let current = { ...goal };
 
-  // Walk from startDate up to yesterday (today can still be logged)
-  const start = new Date(goal.startDate);
+  // Walk from the goal's creation date up to yesterday (today can still be logged).
+  // Using createdAt prevents backfilling days before the goal existed when created mid-month.
+  const createdDate = goal.createdAt.split("T")[0];
+  const effectiveStart = createdDate > goal.startDate ? createdDate : goal.startDate;
+  const start = new Date(effectiveStart);
   const yesterday = new Date(today());
   yesterday.setDate(yesterday.getDate() - 1);
 

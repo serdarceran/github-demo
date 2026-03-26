@@ -9,8 +9,8 @@ import { Difficulty, Goal } from "@/lib/types";
 import {
   getMonthlyTarget,
   getWeeklyTarget,
-  getMonthStart,
   getMonthEnd,
+  today,
   DIFFICULTY_LABELS,
   DIFFICULTY_MULTIPLIERS,
 } from "@/lib/calculations";
@@ -54,7 +54,7 @@ export default function CreateGoalPage() {
       dailyTarget: daily,
       difficulty,
       badgeName: badgeName.trim(),
-      startDate: getMonthStart(now),
+      startDate: today(),
       endDate: getMonthEnd(now),
       status: "active",
       logs: [],
