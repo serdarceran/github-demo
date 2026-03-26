@@ -70,15 +70,17 @@ export default function GoalCard({ goal }: Props) {
         {goal.status === "active" && (
           <div
             className={`mt-3 text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 ${
-              loggedToday
+              loggedToday && todayLog && todayLog.value >= todayLog.required
                 ? "bg-emerald-50 text-emerald-700"
-                : isPenaltyDay
+                : loggedToday || isPenaltyDay
                 ? "bg-amber-50 text-amber-700"
                 : "bg-gray-50 text-gray-600"
             }`}
           >
             {loggedToday ? (
-              <>✅ Logged {todayLog?.value} {goal.unit} today</>
+              todayLog && todayLog.value >= todayLog.required
+                ? <>✅ {todayLog.value} {goal.unit} today — target met</>
+                : <>⚠️ {todayLog?.value} {goal.unit} today · need {todayLog?.required} total</>
             ) : isPenaltyDay ? (
               <>⚠️ Penalty day — need {requiredToday} {goal.unit} (2×)</>
             ) : (

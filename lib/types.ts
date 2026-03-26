@@ -15,8 +15,8 @@ export interface Goal {
   dailyTarget: number;
   difficulty: Difficulty;
   badgeName: string;
-  startDate: string;         // YYYY-MM-DD (1st of goal month)
-  endDate: string;           // YYYY-MM-DD (last day of goal month)
+  startDate: string;         // YYYY-MM-DD (day goal was created)
+  endDate: string;           // YYYY-MM-DD (startDate + 29 days = 30-day window)
   status: GoalStatus;
   logs: DailyLog[];
   cumulativeTotal: number;   // sum of all logged values

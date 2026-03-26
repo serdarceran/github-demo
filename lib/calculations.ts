@@ -31,6 +31,13 @@ export function getMonthEnd(date: Date = new Date()): string {
   return `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, "0")}-${String(lastDay.getDate()).padStart(2, "0")}`;
 }
 
+/** Adds days to a YYYY-MM-DD date string, returns YYYY-MM-DD */
+export function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 /** Today's date as YYYY-MM-DD */
 export function today(): string {
   const d = new Date();

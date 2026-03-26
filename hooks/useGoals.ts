@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Goal, AppState } from "@/lib/types";
 import { loadState, saveState } from "@/lib/storage";
-import { applyDailyLog } from "@/lib/penalty";
+import { applyDailyLog, addToTodayLog } from "@/lib/penalty";
 import { alreadyLoggedToday, today } from "@/lib/calculations";
 
 export function useGoals() {
@@ -40,9 +40,10 @@ export function useGoals() {
     (goalId: string, value: number) => {
       const goal = state.goals.find((g) => g.id === goalId);
       if (!goal || goal.status !== "active") return;
-      if (alreadyLoggedToday(goal)) return;
 
-      const updated = applyDailyLog(goal, value, today());
+      const updated = alreadyLoggedToday(goal)
+        ? addToTodayLog(goal, value)
+        : applyDailyLog(goal, value, today());
       const goals = state.goals.map((g) => (g.id === goalId ? updated : g));
       persistState({ ...state, goals });
     },

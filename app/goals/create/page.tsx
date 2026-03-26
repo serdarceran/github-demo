@@ -9,7 +9,7 @@ import { Difficulty, Goal } from "@/lib/types";
 import {
   getMonthlyTarget,
   getWeeklyTarget,
-  getMonthEnd,
+  addDays,
   today,
   DIFFICULTY_LABELS,
   DIFFICULTY_MULTIPLIERS,
@@ -47,6 +47,7 @@ export default function CreateGoalPage() {
     if (!validate()) return;
 
     const now = new Date();
+    const start = today();
     const goal: Goal = {
       id: uuidv4(),
       name: name.trim(),
@@ -54,8 +55,8 @@ export default function CreateGoalPage() {
       dailyTarget: daily,
       difficulty,
       badgeName: badgeName.trim(),
-      startDate: today(),
-      endDate: getMonthEnd(now),
+      startDate: start,
+      endDate: addDays(start, 29),
       status: "active",
       logs: [],
       cumulativeTotal: 0,

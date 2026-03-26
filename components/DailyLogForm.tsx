@@ -26,28 +26,14 @@ export default function DailyLogForm({ goal, onLog }: Props) {
     );
   }
 
-  if (loggedToday) {
-    const missed = todayLog && todayLog.value < todayLog.required;
-    return (
-      <div
-        className={`rounded-xl p-4 text-sm ${
-          missed ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"
-        }`}
-      >
-        {missed ? (
-          <>⚠️ You logged <strong>{todayLog?.value}</strong> {goal.unit} today, but needed {todayLog?.required}. Tomorrow&apos;s target is doubled.</>
-        ) : (
-          <>✅ You&apos;ve logged <strong>{todayLog?.value}</strong> {goal.unit} today — great work!</>
-        )}
-      </div>
-    );
-  }
+  const todayMissed = loggedToday && todayLog && todayLog.value < todayLog.required;
+  const todayMet = loggedToday && todayLog && todayLog.value >= todayLog.required;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const num = parseFloat(input);
-    if (isNaN(num) || num < 0) {
-      setError("Please enter a valid number (≥ 0).");
+    if (isNaN(num) || num <= 0) {
+      setError("Please enter a positive number.");
       return;
     }
     setError("");
@@ -58,32 +44,44 @@ export default function DailyLogForm({ goal, onLog }: Props) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <h3 className="font-semibold text-gray-800 mb-1">Log Today&apos;s Progress</h3>
-      {isPenaltyDay && (
+
+      {/* Today's status banner */}
+      {loggedToday && (
+        <div className={`mb-3 text-xs px-3 py-2 rounded-lg ${todayMet ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+          {todayMet
+            ? <>✅ <strong>{todayLog?.value} {goal.unit}</strong> logged today — target met! Add more below.</>
+            : <>⚠️ <strong>{todayLog?.value} {goal.unit}</strong> logged — need <strong>{todayLog?.required}</strong> total. Keep adding!</>
+          }
+        </div>
+      )}
+
+      {!loggedToday && isPenaltyDay && (
         <div className="mb-3 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-lg">
           ⚠️ <strong>Penalty day!</strong> You missed yesterday — today requires{" "}
           <strong>{requiredToday} {goal.unit}</strong> (2× normal).
         </div>
       )}
-      {!isPenaltyDay && (
+      {!loggedToday && !isPenaltyDay && (
         <p className="text-sm text-gray-500 mb-3">
           Target: <strong>{requiredToday} {goal.unit}</strong>
         </p>
       )}
+
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
           type="number"
-          min="0"
+          min="1"
           step="1"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Enter ${goal.unit}…`}
+          placeholder={`Add ${goal.unit}…`}
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
         />
         <button
           type="submit"
           className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
-          Log
+          {loggedToday ? "Add" : "Log"}
         </button>
       </form>
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}

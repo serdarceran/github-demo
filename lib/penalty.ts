@@ -30,7 +30,7 @@ export function applyDailyLog(goal: Goal, value: number, date: string = today())
     streak: missed ? 0 : goal.streak + 1,
   };
 
-  return resolveStatus(updatedGoal);
+  return resolveStatus(updatedGoal, date);
 }
 
 /**
@@ -67,18 +67,58 @@ export function applyMissedDays(goal: Goal): Goal {
     cursor.setDate(cursor.getDate() + 1);
   }
 
+  // Catch goals where balance went negative on a previous day but the failure
+  // was deferred (grace period). Now that we're past that day, apply it.
+  if (current.status === "active" && netBalance(current) < 0) {
+    current = { ...current, status: "failed" };
+  }
+
   return current;
+}
+
+/**
+ * Adds to an existing log entry for today, or creates one if none exists.
+ * Recalculates missed/shortfall based on the new cumulative daily value.
+ *
+ * Returns the updated goal (does NOT mutate).
+ */
+export function addToTodayLog(goal: Goal, additionalValue: number): Goal {
+  const todayStr = today();
+  const existingLog = goal.logs.find((l) => l.date === todayStr);
+
+  if (!existingLog) {
+    return applyDailyLog(goal, additionalValue, todayStr);
+  }
+
+  const newValue = existingLog.value + additionalValue;
+  const required = existingLog.required;
+  const oldShortfall = existingLog.missed ? required - existingLog.value : 0;
+  const newMissed = newValue < required;
+  const newShortfall = newMissed ? required - newValue : 0;
+
+  const updatedLog: DailyLog = { ...existingLog, value: newValue, missed: newMissed };
+
+  const updatedGoal: Goal = {
+    ...goal,
+    logs: goal.logs.map((l) => (l.date === todayStr ? updatedLog : l)),
+    cumulativeTotal: goal.cumulativeTotal + additionalValue,
+    totalDebt: goal.totalDebt - oldShortfall + newShortfall,
+    nextDayMultiplier: newMissed ? 2 : 1,
+  };
+
+  return resolveStatus(updatedGoal, todayStr);
 }
 
 /**
  * Resolves goal status based on current state.
  * Called after every log update and when loading from storage.
  */
-export function resolveStatus(goal: Goal): Goal {
+export function resolveStatus(goal: Goal, date: string = today()): Goal {
   if (goal.status !== "active") return goal;
 
-  // Negative net balance → immediate failure
-  if (netBalance(goal) < 0) {
+  // Negative net balance → fail, but grant a 1-day grace period:
+  // if the balance just went negative from today's log, keep active until tomorrow.
+  if (netBalance(goal) < 0 && date < today()) {
     return { ...goal, status: "failed" };
   }
 
