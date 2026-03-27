@@ -22,6 +22,7 @@ interface Props {
 
 const statusColors: Record<string, string> = {
   active: "bg-emerald-100 text-emerald-700",
+  "at-risk": "bg-red-100 text-red-600",
   completed: "bg-sky-100 text-sky-700",
   failed: "bg-red-100 text-red-700",
 };
@@ -39,18 +40,16 @@ export default function GoalCard({ goal }: Props) {
   const requiredToday = Math.min(goal.dailyTarget, expectedByToday(goal));
   const isPenaltyDay = goal.nextDayMultiplier === 2;
   const failsIfMissed = willFailIfMissedToday(goal);
+  const isAtRisk = goal.status === "active" && (failsIfMissed || goal.cumulativeTotal - goal.totalDebt < 0);
 
   return (
-    <div className={`t-goal-card bg-white rounded-xl border hover:shadow-md transition-shadow ${failsIfMissed ? "border-red-400" : "border-gray-200"}`}>
+    <div className={`t-goal-card bg-white rounded-xl border hover:shadow-md transition-shadow ${isAtRisk ? "border-red-400" : "border-gray-200"}`}>
       {/* Header — always visible, tap to collapse on mobile */}
       <div className="t-goal-card-header flex items-center justify-between gap-3 p-5 sm:pb-0">
         <Link href={`/goals/${goal.id}`} className="t-goal-card-title-link flex-1 min-w-0">
           <div className="t-goal-card-title-area">
-            <h3 className="t-goal-card-title font-semibold text-gray-900 text-base leading-tight truncate flex items-center gap-1.5">
+            <h3 className="t-goal-card-title font-semibold text-gray-900 text-base leading-tight truncate">
               {goal.name}
-              {failsIfMissed && (
-                <span title="Goal will fail if you don't log today!" className="text-red-500 shrink-0">⚠️</span>
-              )}
             </h3>
             <p className="t-goal-card-subtitle text-xs text-gray-400 mt-0.5">
               {goal.unit} · {DIFFICULTY_LABELS[goal.difficulty]}
@@ -58,8 +57,8 @@ export default function GoalCard({ goal }: Props) {
           </div>
         </Link>
         <div className="t-goal-card-header-actions flex items-center gap-2 shrink-0">
-          <span className={`t-goal-card-status text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[goal.status]}`}>
-            {goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
+          <span className={`t-goal-card-status text-xs px-2 py-0.5 rounded-full font-medium ${isAtRisk ? statusColors["at-risk"] : statusColors[goal.status]}`}>
+            {isAtRisk ? "⚠ At Risk" : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
           </span>
           <button
             className="t-goal-card-collapse-btn sm:hidden p-1 text-gray-400 hover:text-gray-600 transition-colors"
