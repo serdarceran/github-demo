@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "mcp__playwright__browser_navigate"
+      "mcp__playwright__browser_navigate",
+      "Bash(find . -not -path */node_modules/* -not -path */.git/* -not -path */.next/* -type f -o -type d)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
