@@ -5,9 +5,16 @@ import Navbar from "@/components/Navbar";
 import GoalCard from "@/components/GoalCard";
 import UsernamePrompt from "@/components/UsernamePrompt";
 import Link from "next/link";
+import { willFailIfMissedToday } from "@/lib/calculations";
 
 export default function Dashboard() {
   const { state, hydrated, activeGoals, setUsername } = useGoals();
+
+  const sortedGoals = [...activeGoals].sort((a, b) => {
+    const aAtRisk = a.status === "active" && (willFailIfMissedToday(a) || a.cumulativeTotal - a.totalDebt < 0);
+    const bAtRisk = b.status === "active" && (willFailIfMissedToday(b) || b.cumulativeTotal - b.totalDebt < 0);
+    return (bAtRisk ? 1 : 0) - (aAtRisk ? 1 : 0);
+  });
 
   if (!hydrated) {
     return (
@@ -48,7 +55,7 @@ export default function Dashboard() {
           <EmptyState />
         ) : (
           <div className="t-dashboard-goals-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {activeGoals.map((goal) => (
+            {sortedGoals.map((goal) => (
               <GoalCard key={goal.id} goal={goal} />
             ))}
           </div>
