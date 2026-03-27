@@ -148,7 +148,7 @@ export default function GoalDetailPage() {
           <div className="t-detail-history-card bg-white rounded-xl border border-gray-200 p-5">
             <h2 className="t-detail-history-title font-semibold text-gray-800 mb-4">Log History</h2>
             <div className="t-detail-history-list space-y-2 max-h-72 overflow-y-auto pr-1">
-              {[...goal.logs].reverse().map((log) => (
+              {[...goal.logs].sort((a, b) => b.date.localeCompare(a.date)).map((log) => (
                 <div
                   key={log.date}
                   className={`t-detail-history-entry flex items-center justify-between text-sm px-3 py-2 rounded-lg ${
