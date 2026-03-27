@@ -58,7 +58,8 @@ export default function DailyLogForm({ goal, onLog }: Props) {
             id="log-date"
             type="date"
             value={selectedDate}
-            max={todayStr}
+            min={goal.startDate}
+            max={todayStr < goal.endDate ? todayStr : goal.endDate}
             onChange={(e) => {
               setSelectedDate(e.target.value);
               setError("");
