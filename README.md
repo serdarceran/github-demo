@@ -45,3 +45,61 @@ A Simple Demo for GitHub
   API Routes (server-only)
     └── lib/db.ts (Prisma singleton)
           └── PostgreSQL
+
+---
+
+## Deploying to Vercel
+
+### 1. Push your code to GitHub
+
+Your repository must be hosted on GitHub, GitLab, or Bitbucket before importing into Vercel.
+
+### 2. Provision a PostgreSQL database
+
+Choose one of the following options:
+
+- **Vercel Postgres** (easiest): In your Vercel dashboard go to Storage → Create Database → Postgres. It automatically sets the `DATABASE_URL` environment variable.
+- **Neon** (free tier): Create a project at neon.tech and copy the connection string.
+- **Supabase** (free tier): Create a project at supabase.com and copy the connection string.
+
+### 3. Import the project on Vercel
+
+1. Go to vercel.com → "Add New Project"
+2. Import your GitHub repository
+3. Vercel auto-detects Next.js — no framework configuration needed
+
+### 4. Set environment variables
+
+In your Vercel project settings → Environment Variables, add:
+
+```
+DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require
+```
+
+> Most managed Postgres providers require `?sslmode=require` at the end of the connection string.
+
+### 5. Configure the build command to run migrations
+
+In Vercel project settings → Build & Development Settings, set the **Build Command** to:
+
+```bash
+prisma generate && prisma migrate deploy && next build
+```
+
+Alternatively, add a `vercel.json` file at the project root:
+
+```json
+{
+  "buildCommand": "prisma generate && prisma migrate deploy && next build"
+}
+```
+
+This runs `prisma migrate deploy` (not `migrate dev`), which applies existing migrations non-interactively — the correct mode for production.
+
+### 6. Deploy
+
+Trigger a deployment. Vercel will run the build command, apply database migrations, and publish the app.
+
+**Notes:**
+- Always use `prisma migrate deploy` in production, never `prisma migrate dev`.
+- If you experience connection issues at scale, consider using Prisma Accelerate or a connection pooler such as PgBouncer, as Vercel's serverless functions can open many short-lived database connections.
