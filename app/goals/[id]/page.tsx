@@ -8,7 +8,6 @@ import ProgressBar from "@/components/ProgressBar";
 import BadgeDisplay from "@/components/BadgeDisplay";
 import {
   getMonthlyTarget,
-  getWeeklyTarget,
   progressPercent,
   daysRemaining,
   daysElapsed,
@@ -48,14 +47,12 @@ export default function GoalDetailPage() {
   }
 
   const monthly = getMonthlyTarget(goal.dailyTarget, goal.difficulty);
-  const weekly = getWeeklyTarget(goal.dailyTarget, goal.difficulty);
   const percent = progressPercent(goal);
   const remaining = daysRemaining(goal.endDate);
   const elapsed = daysElapsed(goal.startDate);
   const totalDays = totalGoalDays(goal.startDate, goal.endDate);
   const net = netBalance(goal);
   const expected = expectedByToday(goal);
-  const weeklyPercent = Math.min(100, Math.round((goal.cumulativeTotal / weekly) * 100));
 
   const handleDelete = () => {
     if (confirm("Delete this goal? This cannot be undone.")) {
@@ -122,7 +119,6 @@ export default function GoalDetailPage() {
             color={percent >= 100 ? "green" : "sky"}
             expectedAt={goal.status === "active" ? Math.min(100, Math.round((expected / monthly) * 100)) : undefined}
           />
-          <ProgressBar value={weeklyPercent} label="vs Weekly target" color="amber" />
 
           <div className="t-detail-stats-grid grid grid-cols-2 gap-3 mt-2">
             <StatBox label="Logged" value={goal.cumulativeTotal} unit={goal.unit} />

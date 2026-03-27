@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Goal } from "@/lib/types";
 import {
   getMonthlyTarget,
-  getWeeklyTarget,
   progressPercent,
   expectedByToday,
   daysRemaining,
@@ -31,7 +30,6 @@ export default function GoalCard({ goal }: Props) {
   const [collapsed, setCollapsed] = useState(true);
 
   const monthly = getMonthlyTarget(goal.dailyTarget, goal.difficulty);
-  const weekly = getWeeklyTarget(goal.dailyTarget, goal.difficulty);
   const percent = progressPercent(goal);
   const expectedPercent = Math.min(100, Math.round((expectedByToday(goal) / monthly) * 100));
   const remaining = daysRemaining(goal.endDate);

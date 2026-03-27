@@ -12,10 +12,6 @@ export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   hard: "Hard",
 };
 
-export function getWeeklyTarget(dailyTarget: number, difficulty: Difficulty): number {
-  return Math.round(dailyTarget * 7 * DIFFICULTY_MULTIPLIERS[difficulty]);
-}
-
 export function getMonthlyTarget(dailyTarget: number, difficulty: Difficulty): number {
   return Math.round(dailyTarget * 30 * DIFFICULTY_MULTIPLIERS[difficulty]);
 }

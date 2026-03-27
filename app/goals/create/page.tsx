@@ -8,7 +8,6 @@ import Navbar from "@/components/Navbar";
 import { Difficulty, Goal } from "@/lib/types";
 import {
   getMonthlyTarget,
-  getWeeklyTarget,
   addDays,
   today,
   DIFFICULTY_LABELS,
@@ -30,7 +29,6 @@ export default function CreateGoalPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const daily = parseInt(dailyTarget, 10) || 0;
-  const weekly = daily > 0 ? getWeeklyTarget(daily, difficulty) : 0;
   const monthly = daily > 0 ? getMonthlyTarget(daily, difficulty) : 0;
   const endDate = addDays(startDate, 29);
 
@@ -158,7 +156,6 @@ export default function CreateGoalPage() {
             <div className="t-create-preview bg-sky-50 border border-sky-200 rounded-xl p-4 text-sm space-y-1.5">
               <p className="t-create-preview-title font-semibold text-sky-800 mb-2">Calculated Targets</p>
               <Row label="Daily target" value={`${daily} ${unit || "units"}`} />
-              <Row label="Weekly target" value={`${weekly} ${unit || "units"}`} />
               <Row label="Monthly target" value={`${monthly} ${unit || "units"}`} />
               <Row label="Period" value={`${startDate} → ${endDate}`} />
             </div>
