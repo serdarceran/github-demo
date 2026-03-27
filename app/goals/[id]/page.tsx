@@ -110,7 +110,7 @@ export default function GoalDetailPage() {
         )}
 
         {/* Log form */}
-        <DailyLogForm goal={goal} onLog={(v) => logProgress(goal.id, v)} />
+        <DailyLogForm goal={goal} onLog={(v, date) => logProgress(goal.id, v, date)} />
 
         {/* Progress cards */}
         <div className="t-detail-progress-card bg-white rounded-xl border border-gray-200 p-5 space-y-4">

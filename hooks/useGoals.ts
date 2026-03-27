@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Goal, AppState } from "@/lib/types";
 import { loadState, saveState } from "@/lib/storage";
-import { applyDailyLog, addToTodayLog } from "@/lib/penalty";
-import { alreadyLoggedToday, today } from "@/lib/calculations";
+import { applyDailyLog, addToDateLog } from "@/lib/penalty";
+import { today } from "@/lib/calculations";
 
 export function useGoals() {
   const [state, setState] = useState<AppState>({ username: "", goals: [] });
@@ -37,13 +37,14 @@ export function useGoals() {
   );
 
   const logProgress = useCallback(
-    (goalId: string, value: number) => {
+    (goalId: string, value: number, date: string = today()) => {
       const goal = state.goals.find((g) => g.id === goalId);
       if (!goal || goal.status !== "active") return;
 
-      const updated = alreadyLoggedToday(goal)
-        ? addToTodayLog(goal, value)
-        : applyDailyLog(goal, value, today());
+      const alreadyLogged = goal.logs.some((l) => l.date === date);
+      const updated = alreadyLogged
+        ? addToDateLog(goal, value, date)
+        : applyDailyLog(goal, value, date);
       const goals = state.goals.map((g) => (g.id === goalId ? updated : g));
       persistState({ ...state, goals });
     },

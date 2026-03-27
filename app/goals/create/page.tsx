@@ -26,11 +26,13 @@ export default function CreateGoalPage() {
   const [dailyTarget, setDailyTarget] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [badgeName, setBadgeName] = useState("");
+  const [startDate, setStartDate] = useState(today());
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const daily = parseInt(dailyTarget, 10) || 0;
   const weekly = daily > 0 ? getWeeklyTarget(daily, difficulty) : 0;
   const monthly = daily > 0 ? getMonthlyTarget(daily, difficulty) : 0;
+  const endDate = addDays(startDate, 29);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -47,7 +49,6 @@ export default function CreateGoalPage() {
     if (!validate()) return;
 
     const now = new Date();
-    const start = today();
     const goal: Goal = {
       id: uuidv4(),
       name: name.trim(),
@@ -55,8 +56,8 @@ export default function CreateGoalPage() {
       dailyTarget: daily,
       difficulty,
       badgeName: badgeName.trim(),
-      startDate: start,
-      endDate: addDays(start, 29),
+      startDate,
+      endDate,
       status: "active",
       logs: [],
       cumulativeTotal: 0,
@@ -142,6 +143,16 @@ export default function CreateGoalPage() {
             />
           </Field>
 
+          <Field label="Start Date" error={errors.startDate}>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="t-create-field-input-start-date input"
+            />
+            <p className="text-xs text-gray-400 mt-1">Goal runs 30 days: {startDate} → {endDate}</p>
+          </Field>
+
           {/* Preview */}
           {daily > 0 && (
             <div className="t-create-preview bg-sky-50 border border-sky-200 rounded-xl p-4 text-sm space-y-1.5">
@@ -149,6 +160,7 @@ export default function CreateGoalPage() {
               <Row label="Daily target" value={`${daily} ${unit || "units"}`} />
               <Row label="Weekly target" value={`${weekly} ${unit || "units"}`} />
               <Row label="Monthly target" value={`${monthly} ${unit || "units"}`} />
+              <Row label="Period" value={`${startDate} → ${endDate}`} />
             </div>
           )}
 

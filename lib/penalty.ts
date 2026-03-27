@@ -77,17 +77,16 @@ export function applyMissedDays(goal: Goal): Goal {
 }
 
 /**
- * Adds to an existing log entry for today, or creates one if none exists.
+ * Adds to an existing log entry for a given date, or creates one if none exists.
  * Recalculates missed/shortfall based on the new cumulative daily value.
  *
  * Returns the updated goal (does NOT mutate).
  */
-export function addToTodayLog(goal: Goal, additionalValue: number): Goal {
-  const todayStr = today();
-  const existingLog = goal.logs.find((l) => l.date === todayStr);
+export function addToDateLog(goal: Goal, additionalValue: number, dateStr: string): Goal {
+  const existingLog = goal.logs.find((l) => l.date === dateStr);
 
   if (!existingLog) {
-    return applyDailyLog(goal, additionalValue, todayStr);
+    return applyDailyLog(goal, additionalValue, dateStr);
   }
 
   const newValue = existingLog.value + additionalValue;
@@ -100,13 +99,13 @@ export function addToTodayLog(goal: Goal, additionalValue: number): Goal {
 
   const updatedGoal: Goal = {
     ...goal,
-    logs: goal.logs.map((l) => (l.date === todayStr ? updatedLog : l)),
+    logs: goal.logs.map((l) => (l.date === dateStr ? updatedLog : l)),
     cumulativeTotal: goal.cumulativeTotal + additionalValue,
     totalDebt: goal.totalDebt - oldShortfall + newShortfall,
     nextDayMultiplier: newMissed ? 2 : 1,
   };
 
-  return resolveStatus(updatedGoal, todayStr);
+  return resolveStatus(updatedGoal, dateStr);
 }
 
 /**
