@@ -1,5 +1,5 @@
 import { Goal, DailyLog } from "./types";
-import { getMonthlyTarget, isMonthOver, netBalance, today } from "./calculations";
+import { expectedByToday, getMonthlyTarget, isMonthOver, netBalance, today } from "./calculations";
 
 /**
  * Applies a daily log entry to a goal, enforcing the penalty system.
@@ -15,7 +15,7 @@ import { getMonthlyTarget, isMonthOver, netBalance, today } from "./calculations
  * Returns the updated goal (does NOT mutate).
  */
 export function applyDailyLog(goal: Goal, value: number, date: string = today()): Goal {
-  const required = goal.dailyTarget * goal.nextDayMultiplier;
+  const required = goal.nextDayMultiplier > 1 ? goal.dailyTarget * 2 : expectedByToday(goal);
   const missed = value < required;
   const shortfall = missed ? required - value : 0;
 
