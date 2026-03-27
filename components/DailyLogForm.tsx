@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Goal } from "@/lib/types";
-import { today } from "@/lib/calculations";
+import { today, expectedByToday } from "@/lib/calculations";
 
 interface Props {
   goal: Goal;
@@ -19,7 +19,7 @@ export default function DailyLogForm({ goal, onLog }: Props) {
   const isToday = selectedDate === todayStr;
   const alreadyLogged = !!existingLog;
   const isPenaltyDay = !alreadyLogged && isToday && goal.nextDayMultiplier === 2;
-  const requiredToday = goal.dailyTarget * goal.nextDayMultiplier;
+  const requiredToday = Math.min(goal.dailyTarget, expectedByToday(goal));
 
   if (goal.status !== "active") {
     return (
@@ -94,7 +94,7 @@ export default function DailyLogForm({ goal, onLog }: Props) {
       {!alreadyLogged && isPenaltyDay && (
         <div className="t-log-form-penalty-banner text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-lg">
           ⚠️ <strong>Penalty day!</strong> You missed yesterday — today requires{" "}
-          <strong>{requiredToday} {goal.unit}</strong> (2× normal).
+          <strong>{requiredToday} {goal.unit}</strong>.
         </div>
       )}
 

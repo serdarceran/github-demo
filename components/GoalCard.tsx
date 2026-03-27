@@ -36,7 +36,7 @@ export default function GoalCard({ goal }: Props) {
   const remaining = daysRemaining(goal.endDate);
   const loggedToday = alreadyLoggedToday(goal);
   const todayLog = goal.logs.find((l) => l.date === today());
-  const requiredToday = goal.dailyTarget * goal.nextDayMultiplier;
+  const requiredToday = Math.min(goal.dailyTarget, expectedByToday(goal));
   const isPenaltyDay = goal.nextDayMultiplier === 2;
   const failsIfMissed = willFailIfMissedToday(goal);
 
@@ -115,7 +115,7 @@ export default function GoalCard({ goal }: Props) {
                   ? <>✅ {todayLog.value} {goal.unit} today — target met</>
                   : <>⚠️ {todayLog?.value} {goal.unit} today · need {todayLog?.required} total</>
               ) : isPenaltyDay ? (
-                <>⚠️ Penalty day — need {requiredToday} {goal.unit} (2×){failsIfMissed && " · goal fails if you skip!"}</>
+                <>⚠️ Penalty day — need {requiredToday} {goal.unit}{failsIfMissed && " · goal fails if you skip!"}</>
               ) : failsIfMissed ? (
                 <>🚨 Log today or goal will fail · need {requiredToday} {goal.unit}</>
               ) : (

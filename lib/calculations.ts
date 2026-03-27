@@ -102,7 +102,6 @@ export function alreadyLoggedToday(goal: Goal): boolean {
  */
 export function willFailIfMissedToday(goal: Goal): boolean {
   if (goal.status !== "active" || alreadyLoggedToday(goal)) return false;
-  const required =
-    goal.nextDayMultiplier > 1 ? goal.dailyTarget * 2 : expectedByToday(goal);
+  const required = Math.min(goal.dailyTarget, expectedByToday(goal));
   return goal.cumulativeTotal - (goal.totalDebt + required) < 0;
 }

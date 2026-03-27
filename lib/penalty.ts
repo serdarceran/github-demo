@@ -5,7 +5,7 @@ import { expectedByToday, getMonthlyTarget, isMonthOver, netBalance, today } fro
  * Applies a daily log entry to a goal, enforcing the penalty system.
  *
  * Rules:
- *  - Required = dailyTarget × nextDayMultiplier
+ *  - Required = min(dailyTarget, requiredDailyPace)
  *  - If logged < required → missed, debt += (required - logged), nextDayMultiplier = 2
  *  - If logged >= required → not missed, nextDayMultiplier resets to 1
  *  - After each log: if netBalance < 0 → status = "failed"
@@ -15,7 +15,7 @@ import { expectedByToday, getMonthlyTarget, isMonthOver, netBalance, today } fro
  * Returns the updated goal (does NOT mutate).
  */
 export function applyDailyLog(goal: Goal, value: number, date: string = today()): Goal {
-  const required = goal.nextDayMultiplier > 1 ? goal.dailyTarget * 2 : expectedByToday(goal);
+  const required = Math.min(goal.dailyTarget, expectedByToday(goal));
   const missed = value < required;
   const shortfall = missed ? required - value : 0;
 
