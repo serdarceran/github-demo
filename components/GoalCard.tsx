@@ -10,6 +10,7 @@ import {
   expectedByToday,
   daysRemaining,
   alreadyLoggedToday,
+  willFailIfMissedToday,
   today,
   DIFFICULTY_LABELS,
 } from "@/lib/calculations";
@@ -37,14 +38,20 @@ export default function GoalCard({ goal }: Props) {
   const todayLog = goal.logs.find((l) => l.date === today());
   const requiredToday = goal.dailyTarget * goal.nextDayMultiplier;
   const isPenaltyDay = goal.nextDayMultiplier === 2;
+  const failsIfMissed = willFailIfMissedToday(goal);
 
   return (
-    <div className="t-goal-card bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
+    <div className={`t-goal-card bg-white rounded-xl border hover:shadow-md transition-shadow ${failsIfMissed ? "border-red-400" : "border-gray-200"}`}>
       {/* Header — always visible, tap to collapse on mobile */}
       <div className="t-goal-card-header flex items-center justify-between gap-3 p-5 sm:pb-0">
         <Link href={`/goals/${goal.id}`} className="t-goal-card-title-link flex-1 min-w-0">
           <div className="t-goal-card-title-area">
-            <h3 className="t-goal-card-title font-semibold text-gray-900 text-base leading-tight truncate">{goal.name}</h3>
+            <h3 className="t-goal-card-title font-semibold text-gray-900 text-base leading-tight truncate flex items-center gap-1.5">
+              {goal.name}
+              {failsIfMissed && (
+                <span title="Goal will fail if you don't log today!" className="text-red-500 shrink-0">⚠️</span>
+              )}
+            </h3>
             <p className="t-goal-card-subtitle text-xs text-gray-400 mt-0.5">
               {goal.unit} · {DIFFICULTY_LABELS[goal.difficulty]}
             </p>
@@ -96,6 +103,8 @@ export default function GoalCard({ goal }: Props) {
               className={`t-goal-card-today-status mt-3 text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 ${
                 loggedToday && todayLog && todayLog.value >= todayLog.required
                   ? "bg-emerald-50 text-emerald-700"
+                  : failsIfMissed || (loggedToday && todayLog && todayLog.value < todayLog.required && goal.cumulativeTotal - goal.totalDebt < 0)
+                  ? "bg-red-50 text-red-700"
                   : loggedToday || isPenaltyDay
                   ? "bg-amber-50 text-amber-700"
                   : "bg-gray-50 text-gray-600"
@@ -106,7 +115,9 @@ export default function GoalCard({ goal }: Props) {
                   ? <>✅ {todayLog.value} {goal.unit} today — target met</>
                   : <>⚠️ {todayLog?.value} {goal.unit} today · need {todayLog?.required} total</>
               ) : isPenaltyDay ? (
-                <>⚠️ Penalty day — need {requiredToday} {goal.unit} (2×)</>
+                <>⚠️ Penalty day — need {requiredToday} {goal.unit} (2×){failsIfMissed && " · goal fails if you skip!"}</>
+              ) : failsIfMissed ? (
+                <>🚨 Log today or goal will fail · need {requiredToday} {goal.unit}</>
               ) : (
                 <>📝 Log today · need {requiredToday} {goal.unit}</>
               )}

@@ -95,3 +95,14 @@ export function isMonthOver(endDate: string): boolean {
 export function alreadyLoggedToday(goal: Goal): boolean {
   return goal.logs.some((log) => log.date === today());
 }
+
+/**
+ * Returns true if NOT logging today (i.e. logging 0) would push
+ * netBalance negative, causing the goal to fail tomorrow.
+ */
+export function willFailIfMissedToday(goal: Goal): boolean {
+  if (goal.status !== "active" || alreadyLoggedToday(goal)) return false;
+  const required =
+    goal.nextDayMultiplier > 1 ? goal.dailyTarget * 2 : expectedByToday(goal);
+  return goal.cumulativeTotal - (goal.totalDebt + required) < 0;
+}

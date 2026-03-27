@@ -69,7 +69,10 @@ export function applyMissedDays(goal: Goal): Goal {
 
   // Catch goals where balance went negative on a previous day but the failure
   // was deferred (grace period). Now that we're past that day, apply it.
-  if (current.status === "active" && netBalance(current) < 0) {
+  // Don't fail if today's log is the reason for the negative balance — that's
+  // still within the 1-day grace period granted by resolveStatus.
+  const hasLogToday = current.logs.some((l) => l.date === today());
+  if (current.status === "active" && netBalance(current) < 0 && !hasLogToday) {
     current = { ...current, status: "failed" };
   }
 
