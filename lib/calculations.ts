@@ -78,11 +78,12 @@ export function progressPercent(goal: Goal): number {
   return Math.min(100, Math.round((goal.cumulativeTotal / monthly) * 100));
 }
 
-/** Expected cumulative progress by today based on daily target */
+/** Required daily pace from today to hit the monthly target */
 export function expectedByToday(goal: Goal): number {
-  const elapsed = daysElapsed(goal.startDate);
-  const multiplier = DIFFICULTY_MULTIPLIERS[goal.difficulty];
-  return Math.round(goal.dailyTarget * elapsed * multiplier);
+  const monthly = getMonthlyTarget(goal.dailyTarget, goal.difficulty);
+  const remaining = daysRemaining(goal.endDate);
+  if (remaining === 0) return 0;
+  return Math.max(1, Math.ceil((monthly - goal.cumulativeTotal) / remaining));
 }
 
 /** True if the goal's month has fully passed */

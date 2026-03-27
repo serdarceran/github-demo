@@ -130,7 +130,7 @@ export default function GoalDetailPage() {
             <StatBox label="Days elapsed" value={elapsed} unit={`/ ${totalDays}`} />
             <StatBox label="Days remaining" value={remaining} unit="days" />
             <StatBox
-              label="Expected by today"
+              label="Required daily pace"
               value={expected}
               unit={goal.unit}
               highlight={goal.cumulativeTotal < expected}
