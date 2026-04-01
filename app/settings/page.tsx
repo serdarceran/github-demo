@@ -38,6 +38,23 @@ export default function SettingsPage() {
               <span className="text-sm font-medium text-gray-800 truncate ml-4 text-right">{session?.user?.email}</span>
             </div>
           </div>
+          {session?.user?.roles && session.user.roles.length > 0 && (
+            <div className="px-5 py-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Roles</span>
+                <div className="flex flex-wrap gap-1.5 justify-end ml-4">
+                  {session.user.roles.map((role) => (
+                    <span
+                      key={role}
+                      className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full"
+                    >
+                      {role}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Danger Zone */}
