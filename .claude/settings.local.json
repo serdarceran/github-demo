@@ -10,7 +10,8 @@
       "Bash(sed:*)",
       "Bash(xargs grep:*)",
       "mcp__playwright__browser_resize",
-      "mcp__playwright__browser_take_screenshot"
+      "mcp__playwright__browser_take_screenshot",
+      "Bash(grep -E \"\\\\.ts$|\\\\.tsx$|middleware\")"
     ]
   }
 }
