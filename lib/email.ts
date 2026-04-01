@@ -29,6 +29,32 @@ export async function sendActivationEmail(
   });
 }
 
+export async function sendDeregistrationEmail(
+  email: string,
+  token: string
+): Promise<void> {
+  console.log(
+    `[email] Deregistration link for ${email}: ${appUrl}/deregister/confirm?token=${token}`
+  );
+  await resend.emails.send({
+    from: fromEmail,
+    to: email,
+    subject: "Confirm your GoalTrack account deletion",
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
+        <h2>Delete your account</h2>
+        <p>We received a request to permanently delete your GoalTrack account and all associated data.</p>
+        <p>Click the button below to confirm. <strong>This action cannot be undone.</strong></p>
+        <a href="${appUrl}/deregister/confirm?token=${token}"
+           style="display:inline-block;background:#dc2626;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600">
+          Delete My Account
+        </a>
+        <p style="color:#6b7280;font-size:13px;margin-top:16px">This link expires in 1 hour. If you did not request this, ignore this email — your account will remain active.</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendPasswordResetEmail(
   email: string,
   token: string

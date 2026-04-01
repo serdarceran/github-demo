@@ -88,6 +88,12 @@ export default function Navbar() {
                 <span className="t-navbar-username hidden sm:block text-sm text-gray-500">
                   👤 <span className="font-medium text-gray-700">{session.user.email}</span>
                 </span>
+                <Link
+                  href="/deregister"
+                  className="hidden sm:block text-sm text-red-500 hover:text-red-700 px-3 py-1.5 rounded-md hover:bg-red-50 transition-colors"
+                >
+                  Delete account
+                </Link>
                 <button
                   onClick={handleSignOut}
                   className="text-sm text-gray-500 hover:text-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"

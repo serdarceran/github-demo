@@ -14,8 +14,10 @@ model User {
   emailVerified         DateTime?
   activationToken       String?   @unique
   activationTokenExpiry DateTime?
-  resetToken            String?   @unique
-  resetTokenExpiry      DateTime?
+  resetToken                String?   @unique
+  resetTokenExpiry          DateTime?
+  deregistrationToken       String?   @unique
+  deregistrationTokenExpiry DateTime?
   isGuest               Boolean   @default(false)
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
