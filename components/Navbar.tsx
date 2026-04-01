@@ -88,6 +88,18 @@ export default function Navbar() {
                   {label}
                 </Link>
               ))}
+              {session?.user?.roles?.includes("system-admin") && (
+                <Link
+                  href="/admin"
+                  className={`t-navbar-link px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/admin"
+                      ? "bg-purple-50 text-purple-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
             </div>
           </div>
 
