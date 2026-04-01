@@ -8,7 +8,9 @@
       "Bash(npx tsc:*)",
       "Bash(git -C /c/Users/Serdar.Ceran/WorkDir/ClaudeCode/github-demo log --oneline)",
       "Bash(sed:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_take_screenshot"
     ]
   }
 }
