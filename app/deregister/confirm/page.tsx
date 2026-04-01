@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
-type Status = "loading" | "success" | "invalid" | "expired";
+type Status = "loading" | "success" | "already_deleted" | "invalid" | "expired";
 
 export default function DeregisterConfirmPage() {
   const searchParams = useSearchParams();
@@ -28,7 +28,12 @@ export default function DeregisterConfirmPage() {
           setTimeout(() => router.push("/"), 2500);
         } else {
           const data = await res.json();
-          setStatus(data.error === "INVALID_OR_EXPIRED" ? "expired" : "invalid");
+          if (data.error === "ALREADY_DELETED") {
+            setStatus("already_deleted");
+            await signOut({ redirect: false });
+          } else {
+            setStatus(data.error === "INVALID_OR_EXPIRED" ? "expired" : "invalid");
+          }
         }
       })
       .catch(() => setStatus("invalid"));
@@ -42,7 +47,7 @@ export default function DeregisterConfirmPage() {
     );
   }
 
-  if (status === "success") {
+  if (status === "success" || status === "already_deleted") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center">

@@ -12,15 +12,12 @@ export async function GET(req: NextRequest) {
     where: { deregistrationToken: token },
   });
 
-  if (
-    !user ||
-    !user.deregistrationTokenExpiry ||
-    user.deregistrationTokenExpiry < new Date()
-  ) {
-    return NextResponse.json(
-      { error: "INVALID_OR_EXPIRED" },
-      { status: 400 }
-    );
+  if (!user) {
+    return NextResponse.json({ error: "ALREADY_DELETED" }, { status: 410 });
+  }
+
+  if (!user.deregistrationTokenExpiry || user.deregistrationTokenExpiry < new Date()) {
+    return NextResponse.json({ error: "INVALID_OR_EXPIRED" }, { status: 400 });
   }
 
   // Delete goals first (DailyLogs cascade from Goal)
