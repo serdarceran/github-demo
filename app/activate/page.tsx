@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -15,24 +15,32 @@ export default function ActivatePage() {
   const [email, setEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSent, setResendSent] = useState(false);
+  const called = useRef(false);
 
   useEffect(() => {
+    if (called.current) return;
+    called.current = true;
+
     if (!token) {
       setStatus("invalid");
       return;
     }
 
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     fetch(`/api/auth/activate?token=${encodeURIComponent(token)}`)
       .then(async (res) => {
         if (res.ok) {
           setStatus("success");
-          setTimeout(() => router.push("/"), 2500);
+          timeoutId = setTimeout(() => router.push("/"), 2500);
         } else {
           const data = await res.json();
           setStatus(data.error === "INVALID_OR_EXPIRED" ? "expired" : "invalid");
         }
       })
       .catch(() => setStatus("invalid"));
+
+    return () => clearTimeout(timeoutId);
   }, [token, router]);
 
   async function handleResend() {
