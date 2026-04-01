@@ -1,13 +1,34 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { v4 as uuidv4 } from "uuid";
 import { Goal, AppState } from "@/lib/types";
 import { applyDailyLog, addToDateLog, applyMissedDays } from "@/lib/penalty";
 import { today } from "@/lib/calculations";
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── guest identity ─────────────────────────────────────────────────────────────
 
-const USERNAME_KEY = "goal-tracker-username";
+const GUEST_ID_KEY = "goal-tracker-guest-id";
+
+function getOrCreateGuestId(): string {
+  let id = sessionStorage.getItem(GUEST_ID_KEY);
+  if (!id) {
+    id = uuidv4();
+    sessionStorage.setItem(GUEST_ID_KEY, id);
+  }
+  return id;
+}
+
+export function clearGuestId(): void {
+  sessionStorage.removeItem(GUEST_ID_KEY);
+}
+
+export function getGuestId(): string | null {
+  return sessionStorage.getItem(GUEST_ID_KEY);
+}
+
+// ── helpers ────────────────────────────────────────────────────────────────────
 
 async function apiFetch(path: string, init?: RequestInit) {
   const res = await fetch(path, init);
@@ -15,8 +36,11 @@ async function apiFetch(path: string, init?: RequestInit) {
   return res;
 }
 
-async function loadGoalsFromServer(username: string): Promise<Goal[]> {
-  const res = await apiFetch(`/api/goals?username=${encodeURIComponent(username)}`);
+async function loadGoalsFromServer(userId: string, isGuest: boolean): Promise<Goal[]> {
+  const url = isGuest
+    ? `/api/goals?userId=${encodeURIComponent(userId)}`
+    : `/api/goals`;
+  const res = await apiFetch(url);
   return res.json();
 }
 
@@ -39,28 +63,41 @@ async function persistLog(goalId: string, log: Goal["logs"][number]) {
   });
 }
 
-// ── hook ─────────────────────────────────────────────────────────────────────
+// ── hook ───────────────────────────────────────────────────────────────────────
 
 export function useGoals() {
+  const { data: session, status } = useSession();
   const [state, setState] = useState<AppState>({ username: "", goals: [] });
   const [hydrated, setHydrated] = useState(false);
+  const [userId, setUserId] = useState<string>("");
+  const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    const username = localStorage.getItem(USERNAME_KEY) ?? "";
-    if (!username) {
-      setHydrated(true);
-      return;
+    if (status === "loading") return;
+
+    let effectiveUserId: string;
+    let guest: boolean;
+    let displayName: string;
+
+    if (session?.user) {
+      effectiveUserId = session.user.id;
+      guest = false;
+      displayName = session.user.email.split("@")[0];
+    } else {
+      effectiveUserId = getOrCreateGuestId();
+      guest = true;
+      displayName = "";
     }
 
-    loadGoalsFromServer(username)
-      .then(async (goals) => {
-        // Apply missed-day penalties client-side (pure function — no DB access).
-        const processed = goals.map(applyMissedDays);
+    setUserId(effectiveUserId);
+    setIsGuest(guest);
 
-        setState({ username, goals: processed });
+    loadGoalsFromServer(effectiveUserId, guest)
+      .then(async (goals) => {
+        const processed = goals.map(applyMissedDays);
+        setState({ username: displayName, goals: processed });
         setHydrated(true);
 
-        // Persist any status or log changes that applyMissedDays introduced.
         await Promise.all(
           processed.flatMap((updated, i) => {
             const original = goals[i];
@@ -82,7 +119,6 @@ export function useGoals() {
               );
             }
 
-            // Persist new missed-day logs that were auto-generated.
             const originalDates = new Set(original.logs.map((l) => l.date));
             const newLogs = updated.logs.filter((l) => !originalDates.has(l.date));
             for (const log of newLogs) {
@@ -94,27 +130,24 @@ export function useGoals() {
         );
       })
       .catch(() => setHydrated(true));
-  }, []);
+  }, [session, status]);
 
-  // ── mutations ───────────────────────────────────────────────────────────────
-
-  const setUsername = useCallback(async (username: string) => {
-    localStorage.setItem(USERNAME_KEY, username);
-    const goals = await loadGoalsFromServer(username);
-    setState({ username, goals: goals.map(applyMissedDays) });
-  }, []);
+  // ── mutations ─────────────────────────────────────────────────────────────────
 
   const addGoal = useCallback(
     async (goal: Goal) => {
+      const body: Record<string, unknown> = { goal };
+      if (isGuest) body.userId = userId;
+
       const res = await apiFetch("/api/goals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: state.username, goal }),
+        body: JSON.stringify(body),
       });
       const created: Goal = await res.json();
       setState((prev) => ({ ...prev, goals: [...prev.goals, created] }));
     },
-    [state.username]
+    [userId, isGuest]
   );
 
   const logProgress = useCallback(
@@ -127,13 +160,11 @@ export function useGoals() {
         ? addToDateLog(goal, value, date)
         : applyDailyLog(goal, value, date);
 
-      // Optimistic UI update — don't block on the server round-trip.
       setState((prev) => ({
         ...prev,
         goals: prev.goals.map((g) => (g.id === goalId ? updated : g)),
       }));
 
-      // Persist in parallel.
       const log = updated.logs.find((l) => l.date === date)!;
       await Promise.all([
         persistGoalState(goalId, {
@@ -157,7 +188,7 @@ export function useGoals() {
     }));
   }, []);
 
-  // ── derived state ───────────────────────────────────────────────────────────
+  // ── derived state ─────────────────────────────────────────────────────────────
 
   const activeGoals = state.goals.filter((g) => g.status === "active");
   const archivedGoals = state.goals.filter((g) => g.status !== "active");
@@ -169,7 +200,6 @@ export function useGoals() {
     activeGoals,
     archivedGoals,
     completedGoals,
-    setUsername,
     addGoal,
     logProgress,
     deleteGoal,

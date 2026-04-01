@@ -18,7 +18,7 @@ const difficulties: Difficulty[] = ["easy", "medium", "hard"];
 
 export default function CreateGoalPage() {
   const router = useRouter();
-  const { state, addGoal } = useGoals();
+  const { addGoal } = useGoals();
 
   const [name, setName] = useState("");
   const [unit, setUnit] = useState("");
@@ -71,7 +71,7 @@ export default function CreateGoalPage() {
 
   return (
     <>
-      <Navbar username={state.username} />
+      <Navbar />
       <main className="t-create-main max-w-2xl mx-auto px-4 py-8">
         <h1 className="t-create-title text-2xl font-bold text-gray-900 mb-6">Create a New Goal</h1>
 

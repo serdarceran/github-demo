@@ -3,12 +3,13 @@
 import { useGoals } from "@/hooks/useGoals";
 import Navbar from "@/components/Navbar";
 import GoalCard from "@/components/GoalCard";
-import UsernamePrompt from "@/components/UsernamePrompt";
 import Link from "next/link";
 import { willFailIfMissedToday } from "@/lib/calculations";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
-  const { state, hydrated, activeGoals, setUsername } = useGoals();
+  const { state, hydrated, activeGoals } = useGoals();
+  const { status } = useSession();
 
   const sortedGoals = [...activeGoals].sort((a, b) => {
     const aAtRisk = a.status === "active" && (willFailIfMissedToday(a) || a.cumulativeTotal - a.totalDebt < 0);
@@ -16,7 +17,7 @@ export default function Dashboard() {
     return (bAtRisk ? 1 : 0) - (aAtRisk ? 1 : 0);
   });
 
-  if (!hydrated) {
+  if (status === "loading" || !hydrated) {
     return (
       <div className="t-dashboard-loading min-h-screen flex items-center justify-center">
         <div className="t-dashboard-loading-text animate-pulse text-gray-400 text-sm">Loading…</div>
@@ -26,8 +27,7 @@ export default function Dashboard() {
 
   return (
     <>
-      {!state.username && <UsernamePrompt onSave={setUsername} />}
-      <Navbar username={state.username} />
+      <Navbar />
 
       <main className="t-dashboard-main max-w-5xl mx-auto px-4 py-8">
         {/* Header */}

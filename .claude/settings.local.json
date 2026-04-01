@@ -5,7 +5,9 @@
       "Bash(find . -not -path */node_modules/* -not -path */.git/* -not -path */.next/* -type f -o -type d)",
       "Bash(npm install:*)",
       "Bash(npx prisma:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git -C /c/Users/Serdar.Ceran/WorkDir/ClaudeCode/github-demo log --oneline)",
+      "Bash(sed:*)"
     ]
   }
 }

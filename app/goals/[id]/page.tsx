@@ -35,7 +35,7 @@ export default function GoalDetailPage() {
   if (!goal) {
     return (
       <>
-        <Navbar username={state.username} />
+        <Navbar />
         <main className="t-detail-not-found-main max-w-2xl mx-auto px-4 py-16 text-center">
           <p className="t-detail-not-found-text text-gray-400">Goal not found.</p>
           <button onClick={() => router.push("/")} className="t-detail-not-found-back mt-4 text-sky-600 text-sm underline">
@@ -63,7 +63,7 @@ export default function GoalDetailPage() {
 
   return (
     <>
-      <Navbar username={state.username} />
+      <Navbar />
       <main className="t-detail-main max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Back */}
         <button

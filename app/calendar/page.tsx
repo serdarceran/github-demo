@@ -9,7 +9,7 @@ import { getDaySummary } from "@/lib/calendarUtils";
 import { today } from "@/lib/calculations";
 
 export default function CalendarPage() {
-  const { state, hydrated, activeGoals, logProgress } = useGoals();
+  const { hydrated, activeGoals, logProgress } = useGoals();
 
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
@@ -47,7 +47,7 @@ export default function CalendarPage() {
 
   return (
     <>
-      <Navbar username={state.username} />
+      <Navbar />
       <main className="t-calendar-page-main max-w-5xl mx-auto px-4 py-8">
         {/* Page header */}
         <div className="t-calendar-page-header flex items-center justify-between mb-6">

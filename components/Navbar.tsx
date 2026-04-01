@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { clearGuestId } from "@/hooks/useGoals";
 
 const desktopLinks = [
   { href: "/", label: "Dashboard" },
@@ -40,8 +42,17 @@ const mobileLinks = [
   },
 ];
 
-export default function Navbar({ username }: { username: string }) {
+export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  async function handleSignOut() {
+    clearGuestId();
+    await signOut({ redirect: false });
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <>
@@ -69,11 +80,38 @@ export default function Navbar({ username }: { username: string }) {
               ))}
             </div>
           </div>
-          {username && (
-            <span className="t-navbar-username text-sm text-gray-500">
-              👤 <span className="t-navbar-username-text font-medium text-gray-700">{username}</span>
-            </span>
-          )}
+
+          {/* Auth area */}
+          <div className="flex items-center gap-2">
+            {status === "authenticated" && session?.user ? (
+              <>
+                <span className="t-navbar-username hidden sm:block text-sm text-gray-500">
+                  👤 <span className="font-medium text-gray-700">{session.user.email}</span>
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="text-sm text-gray-500 hover:text-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : status === "unauthenticated" ? (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-md transition-colors"
+                >
+                  Register
+                </Link>
+              </>
+            ) : null}
+          </div>
         </div>
       </nav>
 

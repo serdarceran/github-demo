@@ -1,15 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Goal } from "@/lib/types";
 
-// GET /api/goals?username=<name>
-// Returns all goals (with logs) for the given user.
+// GET /api/goals?userId=<guestId>   (anonymous)
+// GET /api/goals                     (authenticated — reads from session)
 export async function GET(req: NextRequest) {
-  const username = req.nextUrl.searchParams.get("username");
-  if (!username) return NextResponse.json([]);
+  const session = await getServerSession(authOptions);
+
+  let userId: string;
+  if (session?.user?.id) {
+    userId = session.user.id;
+  } else {
+    userId = req.nextUrl.searchParams.get("userId") ?? "";
+    if (!userId) return NextResponse.json([]);
+  }
 
   const user = await prisma.user.findUnique({
-    where: { username },
+    where: { id: userId },
     include: {
       goals: {
         include: { logs: { orderBy: { date: "asc" } } },
@@ -23,16 +32,29 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/goals
-// Body: { username: string; goal: Goal }
-// Creates the user if needed, then persists the goal.
+// Body: { userId?: string (guest only); goal: Goal }
 export async function POST(req: NextRequest) {
-  const { username, goal }: { username: string; goal: Goal } = await req.json();
+  const session = await getServerSession(authOptions);
+  const body = await req.json();
+  const { goal }: { userId?: string; goal: Goal } = body;
 
-  const user = await prisma.user.upsert({
-    where: { username },
-    update: {},
-    create: { username },
-  });
+  let userId: string;
+
+  if (session?.user?.id) {
+    userId = session.user.id;
+  } else {
+    const guestId: string = body.userId;
+    if (!guestId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    // Ensure guest user record exists
+    await prisma.user.upsert({
+      where: { id: guestId },
+      update: {},
+      create: { id: guestId, isGuest: true },
+    });
+    userId = guestId;
+  }
 
   const created = await prisma.goal.create({
     data: {
@@ -49,7 +71,7 @@ export async function POST(req: NextRequest) {
       totalDebt: goal.totalDebt,
       nextDayMultiplier: goal.nextDayMultiplier,
       streak: goal.streak,
-      userId: user.id,
+      userId,
     },
     include: { logs: true },
   });
@@ -57,7 +79,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(toGoal(created), { status: 201 });
 }
 
-// Maps a Prisma goal row (with logs) to the frontend Goal type.
 function toGoal(g: any): Goal {
   return {
     id: g.id,

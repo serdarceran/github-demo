@@ -8,11 +8,18 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  goals     Goal[]
+  id                    String    @id @default(cuid())
+  email                 String?   @unique
+  passwordHash          String?
+  emailVerified         DateTime?
+  activationToken       String?   @unique
+  activationTokenExpiry DateTime?
+  resetToken            String?   @unique
+  resetTokenExpiry      DateTime?
+  isGuest               Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  goals                 Goal[]
 }
 
 model Goal {

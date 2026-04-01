@@ -8,7 +8,7 @@ import Link from "next/link";
 import { getMonthlyTarget, progressPercent } from "@/lib/calculations";
 
 export default function ArchivePage() {
-  const { state, hydrated, completedGoals, archivedGoals } = useGoals();
+  const { hydrated, completedGoals, archivedGoals } = useGoals();
 
   if (!hydrated) {
     return (
@@ -22,7 +22,7 @@ export default function ArchivePage() {
 
   return (
     <>
-      <Navbar username={state.username} />
+      <Navbar />
       <main className="t-archive-main max-w-5xl mx-auto px-4 py-8 space-y-10">
         {/* Badges section */}
         <section className="t-archive-badges-section">
