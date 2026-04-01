@@ -42,9 +42,10 @@ export default function GoalCard({ goal }: Props) {
 
   return (
     <div className={`t-goal-card bg-white rounded-xl border hover:shadow-md transition-shadow ${isAtRisk ? "border-red-400" : "border-gray-200"}`}>
-      {/* Header — always visible, tap to collapse on mobile */}
-      <div className="t-goal-card-header flex items-center justify-between gap-3 p-5 sm:pb-0">
-        <Link href={`/goals/${goal.id}`} className="t-goal-card-title-link flex-1 min-w-0">
+      {/* Header — always visible */}
+      <div className="t-goal-card-header flex items-stretch sm:pb-0">
+        {/* Left: tap to open details page */}
+        <Link href={`/goals/${goal.id}`} className="t-goal-card-title-link flex-1 min-w-0 p-5 sm:pb-0">
           <div className="t-goal-card-title-area">
             <h3 className="t-goal-card-title font-semibold text-gray-900 text-base leading-tight truncate">
               {goal.name}
@@ -54,26 +55,31 @@ export default function GoalCard({ goal }: Props) {
             </p>
           </div>
         </Link>
-        <div className="t-goal-card-header-actions flex items-center gap-2 shrink-0">
+        {/* Desktop: status badge only (no collapse button) */}
+        <div className="hidden sm:flex items-center pr-5">
           <span className={`t-goal-card-status text-xs px-2 py-0.5 rounded-full font-medium ${isAtRisk ? statusColors["at-risk"] : statusColors[goal.status]}`}>
             {isAtRisk ? "⚠ At Risk" : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
           </span>
-          <button
-            className="t-goal-card-collapse-btn sm:hidden p-1 text-gray-400 hover:text-gray-600 transition-colors"
-            onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? "Expand" : "Collapse"}
-          >
-            <svg
-              className={`t-goal-card-chevron w-4 h-4 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
         </div>
+        {/* Mobile: entire right column is the collapse/expand button */}
+        <button
+          className="t-goal-card-collapse-btn sm:hidden flex items-center gap-2 px-4"
+          onClick={() => setCollapsed((c) => !c)}
+          aria-label={collapsed ? "Expand" : "Collapse"}
+        >
+          <span className={`t-goal-card-status text-xs px-2 py-0.5 rounded-full font-medium ${isAtRisk ? statusColors["at-risk"] : statusColors[goal.status]}`}>
+            {isAtRisk ? "⚠ At Risk" : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
+          </span>
+          <svg
+            className={`t-goal-card-chevron w-4 h-4 text-gray-400 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
       </div>
 
       {/* Collapsible details */}
