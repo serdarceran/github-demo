@@ -8,6 +8,9 @@ export async function sendActivationEmail(
   email: string,
   token: string
 ): Promise<void> {
+  console.log(
+    `[email] Activation link for ${email}: ${appUrl}/activate?token=${token}`
+  );
   await resend.emails.send({
     from: fromEmail,
     to: email,
@@ -30,6 +33,9 @@ export async function sendPasswordResetEmail(
   email: string,
   token: string
 ): Promise<void> {
+  console.log(
+    `[email] Password reset link for ${email}: ${appUrl}/reset-password?token=${token}`
+  );
   await resend.emails.send({
     from: fromEmail,
     to: email,
