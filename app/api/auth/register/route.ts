@@ -45,6 +45,13 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  const regularUserRole = await prisma.role.findUnique({ where: { name: "regular-user" } });
+  if (regularUserRole) {
+    await prisma.userRole.create({
+      data: { userId: user.id, roleId: regularUserRole.id },
+    });
+  }
+
   // Migrate guest goals to the new user
   if (guestId) {
     const guestUser = await prisma.user.findUnique({ where: { id: guestId } });

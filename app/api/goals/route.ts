@@ -54,6 +54,16 @@ export async function POST(req: NextRequest) {
       create: { id: guestId, isGuest: true },
     });
     userId = guestId;
+
+    // Assign guest role if not already assigned
+    const guestRole = await prisma.role.findUnique({ where: { name: "guest" } });
+    if (guestRole) {
+      await prisma.userRole.upsert({
+        where: { userId_roleId: { userId: guestId, roleId: guestRole.id } },
+        update: {},
+        create: { userId: guestId, roleId: guestRole.id },
+      });
+    }
   }
 
   const created = await prisma.goal.create({
