@@ -1,0 +1,213 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { clearGuestId } from "@/hooks/useGoals";
+
+const desktopLinks = [
+  { href: "/", label: "Dashboard" },
+  { href: "/calendar", label: "Calendar" },
+  { href: "/goals/create", label: "+ New Goal" },
+  { href: "/archive", label: "Badges & Archive" },
+];
+
+const mobileLinks = [
+  {
+    href: "/",
+    label: "Home",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m4-8v8m-4 0h4" />
+      </svg>
+    ),
+  },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/archive",
+    label: "Archive",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 3h14a2 2 0 012 2v2H3V5a2 2 0 012-2zM3 9h18v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm6 4h6" />
+      </svg>
+    ),
+  },
+  {
+    href: "/settings",
+    label: "Settings",
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+  },
+];
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  async function handleSignOut() {
+    clearGuestId();
+    await signOut({ redirect: false });
+    router.push("/");
+    router.refresh();
+  }
+
+  return (
+    <>
+      {/* ── Top bar ─────────────────────────────────────────── */}
+      <nav className="t-navbar bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="t-navbar-container max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="t-navbar-logo-area flex items-center gap-6">
+            <Link href="/" className="t-navbar-logo-link flex items-center gap-2 font-bold text-sky-600 text-lg">
+              🎯 <span className="t-navbar-logo-text">GoalTrack</span>
+            </Link>
+            {/* Desktop links */}
+            <div className="t-navbar-links hidden sm:flex items-center gap-1">
+              {desktopLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`t-navbar-link px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    pathname === href
+                      ? "bg-sky-50 text-sky-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  {label}
+                </Link>
+              ))}
+              {session?.user?.roles?.includes("system-admin") && (
+                <Link
+                  href="/admin"
+                  className={`t-navbar-link px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/admin"
+                      ? "bg-purple-50 text-purple-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Auth area */}
+          <div className="flex items-center gap-2">
+            {status === "authenticated" && session?.user ? (
+              <>
+                <span className="t-navbar-username hidden sm:block text-sm text-gray-500">
+                  👤 <span className="font-medium text-gray-700">{session.user.email}</span>
+                </span>
+                <Link
+                  href="/settings"
+                  className="hidden sm:flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                  title="Settings"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Settings
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="text-sm text-gray-500 hover:text-gray-800 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : status === "unauthenticated" ? (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/register"
+                  className="text-sm font-semibold bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-md transition-colors"
+                >
+                  Register
+                </Link>
+              </>
+            ) : null}
+          </div>
+        </div>
+      </nav>
+
+      {/* ── Mobile bottom navigation ────────────────────────── */}
+      <nav className="t-navbar-mobile sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 safe-area-inset-bottom">
+        <div className="t-navbar-mobile-inner flex items-end justify-around px-2 h-16">
+
+          {/* Left two items */}
+          {mobileLinks.slice(0, 2).map(({ href, label, icon }) => {
+            const active = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`t-navbar-mobile-link flex flex-col items-center justify-center gap-0.5 flex-1 h-full pt-2 transition-colors ${
+                  active ? "text-sky-600" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {icon}
+                <span className="t-navbar-mobile-link-label text-xs font-medium">{label}</span>
+                {active && (
+                  <span className="t-navbar-mobile-active-dot absolute bottom-1 w-1 h-1 rounded-full bg-sky-500" />
+                )}
+              </Link>
+            );
+          })}
+
+          {/* Center FAB — New Goal */}
+          <div className="t-navbar-mobile-fab-wrapper flex flex-col items-center justify-end flex-1 pb-3">
+            <Link
+              href="/goals/create"
+              className="t-navbar-mobile-fab flex items-center justify-center w-14 h-14 rounded-full bg-sky-600 hover:bg-sky-700 active:scale-95 text-white shadow-lg shadow-sky-200 transition-all -translate-y-3"
+              aria-label="New Goal"
+            >
+              <svg className="t-navbar-mobile-fab-icon w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            </Link>
+            <span className="t-navbar-mobile-fab-label text-xs font-medium text-gray-400 -mt-1">New Goal</span>
+          </div>
+
+          {/* Right item */}
+          {mobileLinks.slice(2).map(({ href, label, icon }) => {
+            const active = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`t-navbar-mobile-link flex flex-col items-center justify-center gap-0.5 flex-1 h-full pt-2 transition-colors ${
+                  active ? "text-sky-600" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {icon}
+                <span className="t-navbar-mobile-link-label text-xs font-medium">{label}</span>
+                {active && (
+                  <span className="t-navbar-mobile-active-dot absolute bottom-1 w-1 h-1 rounded-full bg-sky-500" />
+                )}
+              </Link>
+            );
+          })}
+
+        </div>
+      </nav>
+    </>
+  );
+}

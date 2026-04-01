@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String    @id @default(cuid())
+  email                 String?   @unique
+  passwordHash          String?
+  emailVerified         DateTime?
+  activationToken       String?   @unique
+  activationTokenExpiry DateTime?
+  resetToken                String?   @unique
+  resetTokenExpiry          DateTime?
+  deregistrationToken       String?   @unique
+  deregistrationTokenExpiry DateTime?
+  isGuest               Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  goals                 Goal[]
+  userRoles             UserRole[]
+}
+
+model Goal {
+  id                String     @id
+  name              String
+  unit              String
+  dailyTarget       Float
+  difficulty        String
+  badgeName         String
+  startDate         String
+  endDate           String
+  status            String     @default("active")
+  cumulativeTotal   Float      @default(0)
+  totalDebt         Float      @default(0)
+  nextDayMultiplier Float      @default(1)
+  streak            Int        @default(0)
+  userId            String
+  user              User       @relation(fields: [userId], references: [id])
+  logs              DailyLog[]
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model DailyLog {
+  id       String  @id @default(cuid())
+  date     String
+  value    Float
+  required Float
+  missed   Boolean
+  goalId   String
+  goal     Goal    @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([goalId, date])
+}
+
+model Role {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  userRoles UserRole[]
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
