@@ -4,12 +4,44 @@ import { useGoals } from "@/hooks/useGoals";
 import Navbar from "@/components/Navbar";
 import GoalCard from "@/components/GoalCard";
 import Link from "next/link";
-import { willFailIfMissedToday } from "@goal-tracker/core";
+import { willFailIfMissedToday, today, addDays } from "@goal-tracker/core";
 import { useSession } from "next-auth/react";
+import { v4 as uuidv4 } from "uuid";
+import type { Difficulty, Goal } from "@goal-tracker/types";
+
+const RANDOM_GOAL_NAMES = ["Run", "Read", "Meditate", "Push-ups", "Study", "Walk", "Cycle", "Swim"];
+const RANDOM_UNITS = ["km", "pages", "minutes", "reps", "steps"];
+const RANDOM_DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
+
+function generateRandomGoal(): Goal {
+  const name = RANDOM_GOAL_NAMES[Math.floor(Math.random() * RANDOM_GOAL_NAMES.length)];
+  const unit = RANDOM_UNITS[Math.floor(Math.random() * RANDOM_UNITS.length)];
+  const difficulty = RANDOM_DIFFICULTIES[Math.floor(Math.random() * RANDOM_DIFFICULTIES.length)];
+  const dailyTarget = Math.floor(Math.random() * 50) + 5;
+  const startDate = today();
+  return {
+    id: uuidv4(),
+    name,
+    unit,
+    dailyTarget,
+    difficulty,
+    badgeName: `${name} Champion`,
+    startDate,
+    endDate: addDays(startDate, 29),
+    status: "active",
+    logs: [],
+    cumulativeTotal: 0,
+    totalDebt: 0,
+    nextDayMultiplier: 1,
+    streak: 0,
+    createdAt: new Date().toISOString(),
+  };
+}
 
 export default function Dashboard() {
-  const { state, hydrated, activeGoals } = useGoals();
-  const { status } = useSession();
+  const { state, hydrated, activeGoals, addGoal } = useGoals();
+  const { data: session, status } = useSession();
+  const isAdmin = session?.user?.roles?.includes("system-admin") ?? false;
 
   const sortedGoals = [...activeGoals].sort((a, b) => {
     const aAtRisk = a.status === "active" && (willFailIfMissedToday(a) || a.cumulativeTotal - a.totalDebt < 0);
@@ -42,12 +74,22 @@ export default function Dashboard() {
                 : `${activeGoals.length} active goal${activeGoals.length !== 1 ? "s" : ""}`}
             </p>
           </div>
-          <Link
-            href="/goals/create"
-            className="t-dashboard-new-goal-btn hidden sm:block bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-          >
-            + New Goal
-          </Link>
+          <div className="hidden sm:flex items-center gap-2">
+            {isAdmin && (
+              <button
+                onClick={() => addGoal(generateRandomGoal())}
+                className="t-dashboard-random-goal-btn bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              >
+                + Random Goal
+              </button>
+            )}
+            <Link
+              href="/goals/create"
+              className="t-dashboard-new-goal-btn bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              + New Goal
+            </Link>
+          </div>
         </div>
 
         {/* Active Goals */}
