@@ -66,7 +66,7 @@ export default function CreateGoalPage() {
     };
 
     addGoal(goal);
-    router.push(`/goals/${goal.id}`);
+    router.push("/");
   };
 
   return (
