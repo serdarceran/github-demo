@@ -4,52 +4,100 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+All commands use pnpm and Turborepo from the repo root:
+
 ```bash
-npm run dev      # Start development server
-npm run build    # Production build
-npm run start    # Start production server
-npm run lint     # Run ESLint
+# Prerequisites: start PostgreSQL first
+docker-compose up -d
+
+# Run all apps in dev mode
+pnpm dev
+
+# Run a single app
+pnpm --filter @goal-tracker/web dev
+pnpm --filter @goal-tracker/mobile start
+
+# Build / lint / type-check (all workspaces)
+pnpm build
+pnpm lint
+pnpm type-check
+
+# Database
+pnpm db:migrate           # create + apply migration (prompts for name)
+pnpm db:migrate:prod      # apply existing migrations without prompt (CI/prod)
+pnpm db:generate          # regenerate Prisma client after schema changes
+pnpm db:studio            # Prisma Studio GUI
 ```
 
-No test runner is configured.
+No test runner is configured. Node ≥20 and pnpm ≥9 are required.
 
 ## Architecture
 
-This is a **fully client-side** goal tracking app built with Next.js 14 App Router, TypeScript, and Tailwind CSS. There is no backend, no API routes, and no database — all data lives in browser localStorage.
+This is a **Turborepo monorepo** (pnpm workspaces) containing two apps and four shared packages.
+
+```
+apps/
+  web/      Next.js 14 App Router — the primary web client + API server
+  mobile/   React Native (Expo + Expo Router) — mobile client
+packages/
+  db/       Prisma schema, migrations, and PrismaClient singleton
+  types/    Shared TypeScript interfaces (Goal, DailyLog, AppState, etc.)
+  core/     Shared domain logic: penalty.ts, calculations.ts, calendarUtils.ts
+  api-client/ Shared HTTP client (ApiClient class) + typed API wrappers
+```
 
 ### Data Flow
 
 ```
-localStorage → useGoals hook (React state) → components
-user actions → useGoals callbacks → localStorage
+PostgreSQL ← Prisma (packages/db)
+              ↑
+          Next.js API routes (apps/web/app/api/)
+              ↑
+    ApiClient (packages/api-client)
+              ↑                      ↑
+   Web: useGoals hook (React state)  Mobile: React Query + Zustand
 ```
 
-`hooks/useGoals.ts` is the single source of truth. It hydrates from localStorage on mount, exposes mutations (`addGoal`, `logProgress`, `deleteGoal`, `setUsername`), and persists every change immediately. Components consume it directly — no Context or global state library.
+### Authentication
 
-### Key Domain Logic
+**Web (`apps/web`)**: NextAuth v4 with credentials provider. Sessions are server-side. Guest users are supported — the web client stores a UUID in localStorage as `userId` and passes it as a query param; the API creates an `isGuest: true` User record on first goal creation.
 
-**Penalty system** (`lib/penalty.ts`): Missing a day doubles the next day's required amount (`nextDayMultiplier = 2`). Logging enough resets the multiplier to 1. On app open, `applyMissedDays()` auto-logs 0 for any unlogged past days, triggering penalties retroactively.
+**Mobile (`apps/mobile`)**: JWT token flow. `POST /api/auth/token` exchanges email+password for a JWT. Token is stored in `expo-secure-store`. `useAuthStore` (Zustand, `apps/mobile/stores/authStore.ts`) manages token state and exposes `useApiClient()` for authenticated requests.
 
-**Goal failure** (`lib/calculations.ts`): `netBalance = cumulativeTotal - totalDebt`. If this goes negative at any point, the goal is immediately marked `failed`. Goals also fail at month-end if cumulative total < monthly target.
+### Shared Domain Logic (`packages/core`)
 
-**Difficulty multipliers**: Easy 1.0×, Medium 1.15×, Hard 1.3× — applied to the base daily target.
+- **`penalty.ts`**: Missing a day doubles the next day's required amount (`nextDayMultiplier = 2`). `applyMissedDays()` is called on app open to retroactively log 0 for unlogged past days.
+- **`calculations.ts`**: `netBalance = cumulativeTotal - totalDebt`. Negative balance → immediate `failed` status. Goals also fail at month-end if cumulative total < monthly target.
+- **Difficulty multipliers**: Easy 1.0×, Medium 1.15×, Hard 1.3× on the base daily target.
 
-### Data Model
+### Data Model (Prisma — `packages/db/prisma/schema.prisma`)
 
-Core types are in `lib/types.ts`. The two key interfaces:
+Key models: `User`, `Goal`, `DailyLog`, `Role`, `UserRole`. Goal fields mirror the `Goal` type in `packages/types`. `DailyLog` has a unique constraint on `(goalId, date)`.
 
-- `Goal` — id (UUID), name, unit, dailyTarget, difficulty, status (`active|completed|failed`), logs (`DailyLog[]`), cumulativeTotal, totalDebt, nextDayMultiplier, streak
-- `DailyLog` — date (YYYY-MM-DD), value, required, missed
+### Web API Routes (`apps/web/app/api/`)
 
-State root is `AppState { username, goals[] }`, serialized to localStorage.
+| Method | Path | Description |
+|--------|------|-------------|
+| GET/POST | `/api/goals` | Load or create goals |
+| PATCH | `/api/goals/[id]` | Update goal state after logging |
+| POST | `/api/goals/[id]/logs` | Upsert a daily log entry |
+| DELETE | `/api/goals/[id]` | Delete goal |
+| POST | `/api/auth/token` | Issue JWT for mobile clients |
 
-### Pages
+### Web Pages (`apps/web/app/`)
 
 | Route | Purpose |
-|---|---|
-| `/` | Dashboard — active goals list |
-| `/goals/create` | Create a new monthly goal |
+|-------|---------|
+| `/` | Dashboard — active goals |
+| `/goals/create` | Create a monthly goal |
 | `/goals/[id]` | Goal detail, daily log form, history |
-| `/archive` | Completed/failed goals and earned badges |
+| `/archive` | Completed/failed goals and badges |
+| `/calendar` | Calendar view |
+| `/admin` | Admin user management panel |
+| `/login`, `/register`, `/activate`, etc. | Auth flows |
 
-All pages and components use `"use client"` — there are no server components with data fetching.
+### Environment
+
+Web requires `DATABASE_URL` (PostgreSQL), `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and optionally `RESEND_API_KEY` for email. Mobile requires `EXPO_PUBLIC_API_BASE_URL` pointing at the web app's base URL.
+
+For local dev, `DATABASE_URL="postgresql://goaltracker:goaltracker@localhost:5432/goaltracker"`.
