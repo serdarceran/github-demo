@@ -1,4 +1,4 @@
-import { Goal, DailyLog } from "./types";
+import { Goal, DailyLog } from "@goal-tracker/types";
 import { expectedByToday, getMonthlyTarget, isMonthOver, netBalance, today } from "./calculations";
 
 /**
@@ -45,8 +45,6 @@ export function applyMissedDays(goal: Goal): Goal {
   const loggedDates = new Set(goal.logs.map((l) => l.date));
   let current = { ...goal };
 
-  // Walk from the goal's creation date up to yesterday (today can still be logged).
-  // Using createdAt prevents backfilling days before the goal existed when created mid-month.
   const createdDate = goal.createdAt.split("T")[0];
   const effectiveStart = createdDate > goal.startDate ? createdDate : goal.startDate;
   const start = new Date(effectiveStart);
@@ -59,7 +57,6 @@ export function applyMissedDays(goal: Goal): Goal {
     const dateStr = cursor.toISOString().split("T")[0];
 
     if (!loggedDates.has(dateStr) && dateStr >= goal.startDate) {
-      // Auto-log 0 for the missed day
       current = applyDailyLog(current, 0, dateStr);
       if (current.status !== "active") break;
     }
@@ -67,10 +64,6 @@ export function applyMissedDays(goal: Goal): Goal {
     cursor.setDate(cursor.getDate() + 1);
   }
 
-  // Catch goals where balance went negative on a previous day but the failure
-  // was deferred (grace period). Now that we're past that day, apply it.
-  // Don't fail if today's log is the reason for the negative balance — that's
-  // still within the 1-day grace period granted by resolveStatus.
   const hasLogToday = current.logs.some((l) => l.date === today());
   if (current.status === "active" && netBalance(current) < 0 && !hasLogToday) {
     current = { ...current, status: "failed" };
@@ -118,13 +111,10 @@ export function addToDateLog(goal: Goal, additionalValue: number, dateStr: strin
 export function resolveStatus(goal: Goal, date: string = today()): Goal {
   if (goal.status !== "active") return goal;
 
-  // Negative net balance → fail, but grant a 1-day grace period:
-  // if the balance just went negative from today's log, keep active until tomorrow.
   if (netBalance(goal) < 0 && date < today()) {
     return { ...goal, status: "failed" };
   }
 
-  // Month is over → evaluate against monthly target
   if (isMonthOver(goal.endDate)) {
     const monthly = getMonthlyTarget(goal.dailyTarget, goal.difficulty);
     const status = goal.cumulativeTotal >= monthly ? "completed" : "failed";

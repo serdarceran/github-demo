@@ -1,4 +1,4 @@
-import { Difficulty, Goal } from "./types";
+import { Difficulty, Goal } from "@goal-tracker/types";
 
 export const DIFFICULTY_MULTIPLIERS: Record<Difficulty, number> = {
   easy: 1.0,

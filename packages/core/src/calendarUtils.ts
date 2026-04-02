@@ -1,4 +1,4 @@
-import { Goal, DailyLog } from "./types";
+import { Goal, DailyLog } from "@goal-tracker/types";
 import { today } from "./calculations";
 
 export type DayEntryStatus = "met" | "missed" | "not-logged" | "future";
