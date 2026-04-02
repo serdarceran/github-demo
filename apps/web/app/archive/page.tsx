@@ -13,7 +13,7 @@ export default function ArchivePage() {
   if (!hydrated) {
     return (
       <div className="t-archive-loading min-h-screen flex items-center justify-center">
-        <div className="t-archive-loading-text animate-pulse text-gray-400 text-sm">Loadingâ€¦</div>
+        <div className="t-archive-loading-text animate-pulse text-gray-400 text-sm">Loading…</div>
       </div>
     );
   }
@@ -34,7 +34,7 @@ export default function ArchivePage() {
           </p>
           {completedGoals.length === 0 ? (
             <div className="t-archive-badges-empty text-center py-10 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 text-sm">
-              ðŸ… Earn badges by completing your monthly goals
+              🏅 Earn badges by completing your monthly goals
             </div>
           ) : (
             <div className="t-archive-badges-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -91,12 +91,12 @@ function ArchivedGoalRow({ goal }: { goal: ReturnType<typeof useGoals>["archived
         <div className="t-archive-goal-row-header flex items-center justify-between gap-4 mb-2">
           <div className="t-archive-goal-row-title-area">
             <span className="t-archive-goal-row-name font-semibold text-gray-800">{goal.name}</span>
-            <span className="t-archive-goal-row-dates ml-2 text-xs text-gray-400">{goal.startDate} â€“ {goal.endDate}</span>
+            <span className="t-archive-goal-row-dates ml-2 text-xs text-gray-400">{goal.startDate} – {goal.endDate}</span>
           </div>
           <div className="t-archive-goal-row-actions flex items-center gap-2">
             {goal.status === "completed" && (
               <span className="t-archive-goal-row-badge text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
-                ðŸ… {goal.badgeName}
+                🏅 {goal.badgeName}
               </span>
             )}
             <span

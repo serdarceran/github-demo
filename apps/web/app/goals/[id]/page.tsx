@@ -124,7 +124,7 @@ export default function CreateGoalPage() {
                 >
                   {DIFFICULTY_LABELS[d]}
                   <span className="t-create-difficulty-multiplier block text-xs font-normal opacity-60">
-                    Ã—{DIFFICULTY_MULTIPLIERS[d]}
+                    ×{DIFFICULTY_MULTIPLIERS[d]}
                   </span>
                 </button>
               ))}
@@ -148,7 +148,7 @@ export default function CreateGoalPage() {
               onChange={(e) => setStartDate(e.target.value)}
               className="t-create-field-input-start-date input"
             />
-            <p className="text-xs text-gray-400 mt-1">Goal runs 30 days: {startDate} â†’ {endDate}</p>
+            <p className="text-xs text-gray-400 mt-1">Goal runs 30 days: {startDate} → {endDate}</p>
           </Field>
 
           {/* Preview */}
@@ -157,7 +157,7 @@ export default function CreateGoalPage() {
               <p className="t-create-preview-title font-semibold text-sky-800 mb-2">Calculated Targets</p>
               <Row label="Daily target" value={`${daily} ${unit || "units"}`} />
               <Row label="Monthly target" value={`${monthly} ${unit || "units"}`} />
-              <Row label="Period" value={`${startDate} â†’ ${endDate}`} />
+              <Row label="Period" value={`${startDate} → ${endDate}`} />
             </div>
           )}
 

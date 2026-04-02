@@ -42,7 +42,7 @@ export default function GoalCard({ goal }: Props) {
 
   return (
     <div className={`t-goal-card bg-white rounded-xl border hover:shadow-md transition-shadow ${isAtRisk ? "border-red-400" : "border-gray-200"}`}>
-      {/* Header â€” always visible */}
+      {/* Header — always visible */}
       <div className="t-goal-card-header flex items-stretch sm:pb-0">
         {/* Left: tap to open details page */}
         <Link href={`/goals/${goal.id}`} className="t-goal-card-title-link flex-1 min-w-0 p-5 sm:pb-0">
@@ -51,14 +51,14 @@ export default function GoalCard({ goal }: Props) {
               {goal.name}
             </h3>
             <p className="t-goal-card-subtitle text-xs text-gray-400 mt-0.5">
-              {goal.unit} Â· {DIFFICULTY_LABELS[goal.difficulty]}
+              {goal.unit} · {DIFFICULTY_LABELS[goal.difficulty]}
             </p>
           </div>
         </Link>
         {/* Desktop: status badge only (no collapse button) */}
         <div className="hidden sm:flex items-center pr-5">
           <span className={`t-goal-card-status text-xs px-2 py-0.5 rounded-full font-medium ${isAtRisk ? statusColors["at-risk"] : statusColors[goal.status]}`}>
-            {isAtRisk ? "âš  At Risk" : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
+            {isAtRisk ? "⚠ At Risk" : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
           </span>
         </div>
         {/* Mobile: entire right column is the collapse/expand button */}
@@ -68,7 +68,7 @@ export default function GoalCard({ goal }: Props) {
           aria-label={collapsed ? "Expand" : "Collapse"}
         >
           <span className={`t-goal-card-status text-xs px-2 py-0.5 rounded-full font-medium ${isAtRisk ? statusColors["at-risk"] : statusColors[goal.status]}`}>
-            {isAtRisk ? "âš  At Risk" : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
+            {isAtRisk ? "⚠ At Risk" : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}
           </span>
           <svg
             className={`t-goal-card-chevron w-4 h-4 text-gray-400 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`}
@@ -115,21 +115,21 @@ export default function GoalCard({ goal }: Props) {
             >
               {loggedToday ? (
                 todayLog && todayLog.value >= todayLog.required
-                  ? <>âœ… {todayLog.value} {goal.unit} today â€” target met</>
-                  : <>âš ï¸ {todayLog?.value} {goal.unit} today Â· need {todayLog?.required} total</>
+                  ? <>✅ {todayLog.value} {goal.unit} today — target met</>
+                  : <>⚠️ {todayLog?.value} {goal.unit} today · need {todayLog?.required} total</>
               ) : isPenaltyDay ? (
-                <>âš ï¸ Penalty day â€” need {requiredToday} {goal.unit}{failsIfMissed && " Â· goal fails if you skip!"}</>
+                <>⚠️ Penalty day — need {requiredToday} {goal.unit}{failsIfMissed && " · goal fails if you skip!"}</>
               ) : failsIfMissed ? (
-                <>ðŸš¨ Log today or goal will fail Â· need {requiredToday} {goal.unit}</>
+                <>🚨 Log today or goal will fail · need {requiredToday} {goal.unit}</>
               ) : (
-                <>ðŸ“ Log today Â· need {requiredToday} {goal.unit}</>
+                <>📝 Log today · need {requiredToday} {goal.unit}</>
               )}
             </div>
           )}
 
           {/* Streak */}
           {goal.streak > 0 && (
-            <div className="t-goal-card-streak mt-2 text-xs text-amber-600 font-medium">ðŸ”¥ {goal.streak}-day streak</div>
+            <div className="t-goal-card-streak mt-2 text-xs text-amber-600 font-medium">🔥 {goal.streak}-day streak</div>
           )}
         </div>
       </Link>
