@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Goal } from "@/lib/types";
-import { today, expectedByToday } from "@/lib/calculations";
+import { Goal } from "@goal-tracker/types";
+import { today, expectedByToday } from "@goal-tracker/core";
 
 interface Props {
   goal: Goal;
@@ -79,13 +79,13 @@ export default function DailyLogForm({ goal, onLog }: Props) {
         >
           {todayMet ? (
             <>
-              ✅ <strong>{existingLog?.value} {goal.unit}</strong>
-              {isToday ? " logged today" : ` logged on ${selectedDate}`} — target met! Add more below.
+              âœ… <strong>{existingLog?.value} {goal.unit}</strong>
+              {isToday ? " logged today" : ` logged on ${selectedDate}`} â€” target met! Add more below.
             </>
           ) : (
             <>
-              ⚠️ <strong>{existingLog?.value} {goal.unit}</strong> logged
-              {!isToday && ` on ${selectedDate}`} — needed <strong>{existingLog?.required}</strong> total. Add more below.
+              âš ï¸ <strong>{existingLog?.value} {goal.unit}</strong> logged
+              {!isToday && ` on ${selectedDate}`} â€” needed <strong>{existingLog?.required}</strong> total. Add more below.
             </>
           )}
         </div>
@@ -93,7 +93,7 @@ export default function DailyLogForm({ goal, onLog }: Props) {
 
       {!alreadyLogged && isPenaltyDay && (
         <div className="t-log-form-penalty-banner text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-lg">
-          ⚠️ <strong>Penalty day!</strong> You missed yesterday — today requires{" "}
+          âš ï¸ <strong>Penalty day!</strong> You missed yesterday â€” today requires{" "}
           <strong>{requiredToday} {goal.unit}</strong>.
         </div>
       )}
@@ -112,7 +112,7 @@ export default function DailyLogForm({ goal, onLog }: Props) {
           step="1"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Add ${goal.unit}…`}
+          placeholder={`Add ${goal.unit}â€¦`}
           className="t-log-form-input flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
         />
         <button

@@ -4,7 +4,7 @@ import { useGoals } from "@/hooks/useGoals";
 import Navbar from "@/components/Navbar";
 import GoalCard from "@/components/GoalCard";
 import Link from "next/link";
-import { willFailIfMissedToday } from "@/lib/calculations";
+import { willFailIfMissedToday } from "@goal-tracker/core";
 import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
@@ -20,7 +20,7 @@ export default function Dashboard() {
   if (status === "loading" || !hydrated) {
     return (
       <div className="t-dashboard-loading min-h-screen flex items-center justify-center">
-        <div className="t-dashboard-loading-text animate-pulse text-gray-400 text-sm">Loading…</div>
+        <div className="t-dashboard-loading-text animate-pulse text-gray-400 text-sm">Loadingâ€¦</div>
       </div>
     );
   }
@@ -34,7 +34,7 @@ export default function Dashboard() {
         <div className="t-dashboard-header flex items-center justify-center sm:justify-between mb-6">
           <div className="t-dashboard-header-left text-center sm:text-left">
             <h1 className="t-dashboard-title text-2xl font-bold text-gray-900">
-              {state.username ? `Hi, ${state.username} 👋` : "Dashboard"}
+              {state.username ? `Hi, ${state.username} ðŸ‘‹` : "Dashboard"}
             </h1>
             <p className="t-dashboard-subtitle text-gray-500 text-sm mt-0.5">
               {activeGoals.length === 0
@@ -68,7 +68,7 @@ export default function Dashboard() {
 function EmptyState() {
   return (
     <div className="t-dashboard-empty text-center py-20 border-2 border-dashed border-gray-200 rounded-2xl">
-      <div className="t-dashboard-empty-icon text-5xl mb-4">🎯</div>
+      <div className="t-dashboard-empty-icon text-5xl mb-4">ðŸŽ¯</div>
       <h2 className="t-dashboard-empty-title text-lg font-semibold text-gray-700 mb-1">No active goals</h2>
       <p className="t-dashboard-empty-text text-gray-400 text-sm mb-5">Start by creating your first goal for this month.</p>
       <Link

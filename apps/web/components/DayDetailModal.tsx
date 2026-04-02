@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { DaySummary, DayEntryStatus } from "@/lib/calendarUtils";
-import { today } from "@/lib/calculations";
+import { DaySummary, DayEntryStatus } from "@goal-tracker/core";
+import { today } from "@goal-tracker/core";
 
 interface Props {
   summary: DaySummary;
@@ -18,10 +18,10 @@ const rowBg: Record<DayEntryStatus, string> = {
 };
 
 const statusIcon: Record<DayEntryStatus, string> = {
-  met:         "✅",
-  missed:      "❌",
-  "not-logged": "❌",
-  future:      "⏳",
+  met:         "âœ…",
+  missed:      "âŒ",
+  "not-logged": "âŒ",
+  future:      "â³",
 };
 
 export default function DayDetailModal({ summary, onClose, onLog }: Props) {
@@ -111,7 +111,7 @@ export default function DayDetailModal({ summary, onClose, onLog }: Props) {
                     {" "}{entry.goal.unit}
                     {entry.log.missed && (
                       <span className="t-day-modal-goal-missed ml-1.5 text-red-500 font-medium">
-                        · missed
+                        Â· missed
                       </span>
                     )}
                   </p>
@@ -121,7 +121,7 @@ export default function DayDetailModal({ summary, onClose, onLog }: Props) {
                   <p className="t-day-modal-goal-no-log text-xs text-red-400">No entry recorded</p>
                 )}
 
-                {/* Log input — today + active goals only */}
+                {/* Log input â€” today + active goals only */}
                 {isToday && entry.goal.status === "active" && (
                   <div className="t-day-modal-log-row mt-3 flex gap-2">
                     <input
@@ -131,7 +131,7 @@ export default function DayDetailModal({ summary, onClose, onLog }: Props) {
                       onChange={(e) =>
                         setInputs((prev) => ({ ...prev, [entry.goal.id]: e.target.value }))
                       }
-                      placeholder={`Add ${entry.goal.unit}…`}
+                      placeholder={`Add ${entry.goal.unit}â€¦`}
                       className="t-day-modal-log-input flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                     <button

@@ -5,8 +5,8 @@ import { useGoals } from "@/hooks/useGoals";
 import Navbar from "@/components/Navbar";
 import Calendar from "@/components/Calendar";
 import DayDetailModal from "@/components/DayDetailModal";
-import { getDaySummary } from "@/lib/calendarUtils";
-import { today } from "@/lib/calculations";
+import { getDaySummary } from "@goal-tracker/core";
+import { today } from "@goal-tracker/core";
 
 export default function CalendarPage() {
   const { hydrated, activeGoals, logProgress } = useGoals();
@@ -36,7 +36,7 @@ export default function CalendarPage() {
   if (!hydrated) {
     return (
       <div className="t-calendar-page-loading min-h-screen flex items-center justify-center">
-        <div className="t-calendar-page-loading-text animate-pulse text-gray-400 text-sm">Loading…</div>
+        <div className="t-calendar-page-loading-text animate-pulse text-gray-400 text-sm">Loadingâ€¦</div>
       </div>
     );
   }

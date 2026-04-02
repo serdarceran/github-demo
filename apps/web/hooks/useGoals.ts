@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { v4 as uuidv4 } from "uuid";
-import { Goal, AppState } from "@/lib/types";
-import { applyDailyLog, addToDateLog, applyMissedDays } from "@/lib/penalty";
-import { today } from "@/lib/calculations";
+import { Goal, AppState } from "@goal-tracker/types";
+import { applyDailyLog, addToDateLog, applyMissedDays } from "@goal-tracker/core";
+import { today } from "@goal-tracker/core";
 
-// ── guest identity ─────────────────────────────────────────────────────────────
+// â”€â”€ guest identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const GUEST_ID_KEY = "goal-tracker-guest-id";
 
@@ -28,7 +28,7 @@ export function getGuestId(): string | null {
   return sessionStorage.getItem(GUEST_ID_KEY);
 }
 
-// ── helpers ────────────────────────────────────────────────────────────────────
+// â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function apiFetch(path: string, init?: RequestInit) {
   const res = await fetch(path, init);
@@ -63,7 +63,7 @@ async function persistLog(goalId: string, log: Goal["logs"][number]) {
   });
 }
 
-// ── hook ───────────────────────────────────────────────────────────────────────
+// â”€â”€ hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function useGoals() {
   const { data: session, status } = useSession();
@@ -132,7 +132,7 @@ export function useGoals() {
       .catch(() => setHydrated(true));
   }, [session, status]);
 
-  // ── mutations ─────────────────────────────────────────────────────────────────
+  // â”€â”€ mutations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const addGoal = useCallback(
     async (goal: Goal) => {
@@ -188,7 +188,7 @@ export function useGoals() {
     }));
   }, []);
 
-  // ── derived state ─────────────────────────────────────────────────────────────
+  // â”€â”€ derived state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const activeGoals = state.goals.filter((g) => g.status === "active");
   const archivedGoals = state.goals.filter((g) => g.status !== "active");

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { ASSIGNABLE_ROLES } from "@/lib/roles";
+import { prisma } from "@goal-tracker/db";
+import { ASSIGNABLE_ROLES } from "@goal-tracker/types";
 
 // PUT /api/admin/users/[id]/roles
 // Body: { roles: string[] }

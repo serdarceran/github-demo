@@ -1,7 +1,7 @@
 "use client";
 
-import { DaySummary } from "@/lib/calendarUtils";
-import { today } from "@/lib/calculations";
+import { DaySummary } from "@goal-tracker/core";
+import { today } from "@goal-tracker/core";
 
 interface Props {
   dateStr: string | null;
@@ -70,7 +70,7 @@ export default function DayCell({ dateStr, summary, onClick }: Props) {
         </div>
       )}
 
-      {/* met/total count — bottom-right */}
+      {/* met/total count â€” bottom-right */}
       {entries.length > 0 &&
         summary?.overallStatus !== "future" &&
         summary?.overallStatus !== "no-goals" && (

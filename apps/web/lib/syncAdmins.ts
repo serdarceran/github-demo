@@ -1,9 +1,9 @@
-import { prisma } from "@/lib/db";
+import { prisma } from "@goal-tracker/db";
 
 /**
  * Called once on server startup via instrumentation.ts.
  * Ensures every email in SYSTEM_ADMIN_EMAILS has the system-admin role in the DB.
- * This is the source of truth — it cannot be overridden via the admin panel.
+ * This is the source of truth â€” it cannot be overridden via the admin panel.
  */
 export async function syncSystemAdmins(): Promise<void> {
   const raw = process.env.SYSTEM_ADMIN_EMAILS ?? "";

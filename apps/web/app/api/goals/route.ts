@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { Goal } from "@/lib/types";
+import { prisma } from "@goal-tracker/db";
+import { Goal } from "@goal-tracker/types";
 
 // GET /api/goals?userId=<guestId>   (anonymous)
-// GET /api/goals                     (authenticated — reads from session)
+// GET /api/goals                     (authenticated â€” reads from session)
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 

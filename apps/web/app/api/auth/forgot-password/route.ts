@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma } from "@goal-tracker/db";
 import { generateToken } from "@/lib/tokens";
 import { sendPasswordResetEmail, sendActivationEmail } from "@/lib/email";
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  // Account exists but not yet activated — resend activation email instead
+  // Account exists but not yet activated â€” resend activation email instead
   if (!user.emailVerified) {
     try {
       await sendActivationEmail(email, user.activationToken!);

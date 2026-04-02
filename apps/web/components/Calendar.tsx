@@ -1,12 +1,12 @@
 "use client";
 
-import { Goal } from "@/lib/types";
+import { Goal } from "@goal-tracker/types";
 import {
   buildCalendarGrid,
   getDaySummary,
   MONTH_NAMES,
   DAY_NAMES_SHORT,
-} from "@/lib/calendarUtils";
+} from "@goal-tracker/core";
 import DayCell from "./DayCell";
 
 interface Props {

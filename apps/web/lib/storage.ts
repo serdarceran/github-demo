@@ -1,5 +1,5 @@
-import { Goal, AppState } from "./types";
-import { applyMissedDays } from "./penalty";
+import { Goal, AppState } from "@goal-tracker/types";
+import { applyMissedDays } from "@goal-tracker/core";
 
 const STORAGE_KEY = "goal_tracker_state";
 

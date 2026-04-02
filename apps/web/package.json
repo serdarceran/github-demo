@@ -1,0 +1,44 @@
+{
+  "name": "@goal-tracker/web",
+  "version": "0.1.0",
+  "private": true,
+  "prisma": {
+    "schemaPath": "../../packages/db/prisma/schema.prisma"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@goal-tracker/api-client": "workspace:*",
+    "@goal-tracker/core": "workspace:*",
+    "@goal-tracker/db": "workspace:*",
+    "@goal-tracker/types": "workspace:*",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
+    "jose": "^5.9.6",
+    "next": "14.2.3",
+    "next-auth": "^4.24.13",
+    "react": "^18",
+    "react-dom": "^18",
+    "resend": "^6.10.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

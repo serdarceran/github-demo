@@ -1,27 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { DailyLog } from "@/lib/types";
+import { prisma } from "@goal-tracker/db";
+import bcrypt from "bcryptjs";
 
-// POST /api/goals/:id/logs
-// Upserts a daily log entry for the given goal.
-// If a log already exists for that date, it is overwritten.
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const log: DailyLog = await req.json();
+export async function POST(req: NextRequest) {
+  const { token, password } = await req.json();
 
-  const upserted = await prisma.dailyLog.upsert({
-    where: { goalId_date: { goalId: params.id, date: log.date } },
-    update: { value: log.value, required: log.required, missed: log.missed },
-    create: {
-      goalId: params.id,
-      date: log.date,
-      value: log.value,
-      required: log.required,
-      missed: log.missed,
+  if (!token || !password) {
+    return NextResponse.json(
+      { error: "Token and password are required." },
+      { status: 400 }
+    );
+  }
+
+  if (password.length < 8) {
+    return NextResponse.json(
+      { error: "Password must be at least 8 characters." },
+      { status: 400 }
+    );
+  }
+
+  const user = await prisma.user.findUnique({ where: { resetToken: token } });
+
+  if (
+    !user ||
+    !user.resetTokenExpiry ||
+    user.resetTokenExpiry < new Date()
+  ) {
+    return NextResponse.json(
+      { error: "INVALID_OR_EXPIRED" },
+      { status: 400 }
+    );
+  }
+
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      passwordHash,
+      resetToken: null,
+      resetTokenExpiry: null,
     },
   });
 
-  return NextResponse.json(upserted, { status: 201 });
+  return NextResponse.json({ ok: true });
 }

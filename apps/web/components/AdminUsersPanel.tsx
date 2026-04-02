@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ASSIGNABLE_ROLES } from "@/lib/roles";
+import { ASSIGNABLE_ROLES } from "@goal-tracker/types";
 
 type UserRow = {
   id: string;
@@ -46,7 +46,7 @@ export default function AdminUsersPanel() {
   }
 
   if (loading) {
-    return <p className="text-sm text-gray-400 animate-pulse">Loading users…</p>;
+    return <p className="text-sm text-gray-400 animate-pulse">Loading usersâ€¦</p>;
   }
 
   return (
