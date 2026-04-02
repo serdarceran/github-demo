@@ -1,47 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@goal-tracker/db";
-import bcrypt from "bcryptjs";
 
-export async function POST(req: NextRequest) {
-  const { token, password } = await req.json();
+// PATCH /api/goals/:id
+// Body: { status, cumulativeTotal, totalDebt, nextDayMultiplier, streak }
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  const { id } = params;
+  const body = await req.json();
 
-  if (!token || !password) {
-    return NextResponse.json(
-      { error: "Token and password are required." },
-      { status: 400 }
-    );
+  const goal = await prisma.goal.findUnique({ where: { id } });
+  if (!goal) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  if (session?.user?.id) {
+    if (goal.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
-  if (password.length < 8) {
-    return NextResponse.json(
-      { error: "Password must be at least 8 characters." },
-      { status: 400 }
-    );
-  }
-
-  const user = await prisma.user.findUnique({ where: { resetToken: token } });
-
-  if (
-    !user ||
-    !user.resetTokenExpiry ||
-    user.resetTokenExpiry < new Date()
-  ) {
-    return NextResponse.json(
-      { error: "INVALID_OR_EXPIRED" },
-      { status: 400 }
-    );
-  }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  await prisma.user.update({
-    where: { id: user.id },
+  const updated = await prisma.goal.update({
+    where: { id },
     data: {
-      passwordHash,
-      resetToken: null,
-      resetTokenExpiry: null,
+      status: body.status,
+      cumulativeTotal: body.cumulativeTotal,
+      totalDebt: body.totalDebt,
+      nextDayMultiplier: body.nextDayMultiplier,
+      streak: body.streak,
     },
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json(updated);
+}
+
+// DELETE /api/goals/:id
+export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  const { id } = params;
+
+  const goal = await prisma.goal.findUnique({ where: { id } });
+  if (!goal) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  if (session?.user?.id) {
+    if (goal.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  }
+
+  await prisma.goal.delete({ where: { id } });
+
+  return new NextResponse(null, { status: 204 });
 }
