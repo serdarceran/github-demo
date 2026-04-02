@@ -3,22 +3,35 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@goal-tracker/db";
 import { Goal } from "@goal-tracker/types";
+import { verifyBearerToken } from "@/lib/mobileAuth";
+import { corsHeaders, optionsResponse } from "@/lib/cors";
+
+export function OPTIONS() {
+  return optionsResponse();
+}
+
+async function resolveUserId(req: NextRequest): Promise<string | null> {
+  const session = await getServerSession(authOptions);
+  if (session?.user?.id) return session.user.id;
+
+  const mobile = await verifyBearerToken(req);
+  if (mobile?.userId) return mobile.userId;
+
+  return null;
+}
 
 // GET /api/goals?userId=<guestId>   (anonymous)
-// GET /api/goals                     (authenticated â€” reads from session)
+// GET /api/goals                     (authenticated — reads from session or Bearer)
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const userId = await resolveUserId(req);
 
-  let userId: string;
-  if (session?.user?.id) {
-    userId = session.user.id;
-  } else {
-    userId = req.nextUrl.searchParams.get("userId") ?? "";
-    if (!userId) return NextResponse.json([]);
-  }
+  const guestId = !userId ? (req.nextUrl.searchParams.get("userId") ?? "") : null;
+  const effectiveId = userId ?? guestId;
+
+  if (!effectiveId) return NextResponse.json([], { headers: corsHeaders });
 
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: effectiveId },
     include: {
       goals: {
         include: { logs: { orderBy: { date: "asc" } } },
@@ -27,35 +40,33 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  if (!user) return NextResponse.json([]);
-  return NextResponse.json(user.goals.map(toGoal));
+  if (!user) return NextResponse.json([], { headers: corsHeaders });
+  return NextResponse.json(user.goals.map(toGoal), { headers: corsHeaders });
 }
 
 // POST /api/goals
 // Body: { userId?: string (guest only); goal: Goal }
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const userId = await resolveUserId(req);
   const body = await req.json();
   const { goal }: { userId?: string; goal: Goal } = body;
 
-  let userId: string;
+  let effectiveUserId: string;
 
-  if (session?.user?.id) {
-    userId = session.user.id;
+  if (userId) {
+    effectiveUserId = userId;
   } else {
     const guestId: string = body.userId;
     if (!guestId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: corsHeaders });
     }
-    // Ensure guest user record exists
     await prisma.user.upsert({
       where: { id: guestId },
       update: {},
       create: { id: guestId, isGuest: true },
     });
-    userId = guestId;
+    effectiveUserId = guestId;
 
-    // Assign guest role if not already assigned
     const guestRole = await prisma.role.findUnique({ where: { name: "guest" } });
     if (guestRole) {
       await prisma.userRole.upsert({
@@ -81,12 +92,12 @@ export async function POST(req: NextRequest) {
       totalDebt: goal.totalDebt,
       nextDayMultiplier: goal.nextDayMultiplier,
       streak: goal.streak,
-      userId,
+      userId: effectiveUserId,
     },
     include: { logs: true },
   });
 
-  return NextResponse.json(toGoal(created), { status: 201 });
+  return NextResponse.json(toGoal(created), { status: 201, headers: corsHeaders });
 }
 
 function toGoal(g: any): Goal {

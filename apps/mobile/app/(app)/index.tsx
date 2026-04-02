@@ -1,18 +1,20 @@
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { createGoalsApi } from "@goal-tracker/api-client";
-import { useApiClient } from "../../stores/authStore";
+import { useApiClient, useAuthStore } from "../../stores/authStore";
 import type { Goal } from "@goal-tracker/types";
 
 export default function GoalsScreen() {
   const client = useApiClient();
+  const token = useAuthStore((s) => s.token);
   const { data: goals, isLoading, error } = useQuery<Goal[]>({
-    queryKey: ["goals"],
+    queryKey: ["goals", token],
     queryFn: () => createGoalsApi(client).list(),
+    enabled: !!token,
   });
 
   if (isLoading) return <View style={styles.center}><Text>Loading…</Text></View>;
-  if (error) return <View style={styles.center}><Text>Failed to load goals.</Text></View>;
+  if (error) return <View style={styles.center}><Text>Failed to load goals: {error.message}</Text></View>;
 
   return (
     <View style={styles.container}>

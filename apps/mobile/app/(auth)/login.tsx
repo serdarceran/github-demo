@@ -15,8 +15,9 @@ export default function LoginScreen() {
     try {
       await login(email, password);
       router.replace("/(app)");
-    } catch {
-      setError("Invalid credentials. Please try again.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Login failed. Please try again.";
+      setError(msg);
     }
   }
 

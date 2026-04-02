@@ -3,25 +3,35 @@ import { SignJWT } from "jose";
 import { prisma } from "@goal-tracker/db";
 import bcrypt from "bcryptjs";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
   if (!email || !password) {
-    return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
+    return NextResponse.json({ error: "Missing credentials" }, { status: 400, headers: corsHeaders });
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !user.passwordHash) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401, headers: corsHeaders });
   }
 
   if (!user.emailVerified) {
-    return NextResponse.json({ error: "Email not verified" }, { status: 403 });
+    return NextResponse.json({ error: "Email not verified" }, { status: 403, headers: corsHeaders });
   }
 
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401, headers: corsHeaders });
   }
 
   const userRoles = await prisma.userRole.findMany({
@@ -37,5 +47,5 @@ export async function POST(req: NextRequest) {
     .setExpirationTime("7d")
     .sign(secret);
 
-  return NextResponse.json({ token });
+  return NextResponse.json({ token }, { headers: corsHeaders });
 }
