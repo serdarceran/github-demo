@@ -7,8 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 All commands use pnpm and Turborepo from the repo root:
 
 ```bash
-# Prerequisites: start PostgreSQL first
-docker-compose up -d
+# Prerequisites (fresh clone or after deleting node_modules)
+docker-compose up -d       # start PostgreSQL
+pnpm install               # install dependencies
+pnpm db:generate           # generate Prisma client
 
 # Run all apps in dev mode
 pnpm dev
@@ -29,13 +31,13 @@ pnpm db:generate          # regenerate Prisma client after schema changes
 pnpm db:studio            # Prisma Studio GUI
 ```
 
-No test runner is configured. Node ≥20 and pnpm ≥9 are required.
+No test runner is configured. Node ≥20 and pnpm ≥10 are required.
 
 ## Architecture
 
 This is a **Turborepo monorepo** (pnpm workspaces) containing two apps and four shared packages.
 
-```
+```text
 apps/
   web/      Next.js 14 App Router — the primary web client + API server
   mobile/   React Native (Expo + Expo Router) — mobile client
@@ -48,7 +50,7 @@ packages/
 
 ### Data Flow
 
-```
+```text
 PostgreSQL ← Prisma (packages/db)
               ↑
           Next.js API routes (apps/web/app/api/)
@@ -77,7 +79,7 @@ Key models: `User`, `Goal`, `DailyLog`, `Role`, `UserRole`. Goal fields mirror t
 ### Web API Routes (`apps/web/app/api/`)
 
 | Method | Path | Description |
-|--------|------|-------------|
+| ------ | ---- | ----------- |
 | GET/POST | `/api/goals` | Load or create goals |
 | PATCH | `/api/goals/[id]` | Update goal state after logging |
 | POST | `/api/goals/[id]/logs` | Upsert a daily log entry |
@@ -87,7 +89,7 @@ Key models: `User`, `Goal`, `DailyLog`, `Role`, `UserRole`. Goal fields mirror t
 ### Web Pages (`apps/web/app/`)
 
 | Route | Purpose |
-|-------|---------|
+| ----- | ------- |
 | `/` | Dashboard — active goals |
 | `/goals/create` | Create a monthly goal |
 | `/goals/[id]` | Goal detail, daily log form, history |

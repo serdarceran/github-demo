@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
 type Status = "loading" | "success" | "already_deleted" | "invalid" | "expired";
 
-export default function DeregisterConfirmPage() {
+function DeregisterConfirmContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -76,5 +76,13 @@ export default function DeregisterConfirmPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function DeregisterConfirmPage() {
+  return (
+    <Suspense>
+      <DeregisterConfirmContent />
+    </Suspense>
   );
 }

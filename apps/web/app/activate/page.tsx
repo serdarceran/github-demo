@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 type Status = "loading" | "success" | "invalid" | "expired";
 
-export default function ActivatePage() {
+function ActivateContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -117,5 +117,13 @@ export default function ActivatePage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ActivatePage() {
+  return (
+    <Suspense>
+      <ActivateContent />
+    </Suspense>
   );
 }

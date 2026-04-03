@@ -50,6 +50,6 @@ export async function PUT(
 
   return NextResponse.json({
     id: params.id,
-    roles: updated!.userRoles.map((ur) => ur.role.name),
+    roles: updated!.userRoles.map((ur: { role: { name: string } }) => ur.role.name),
   });
 }
