@@ -47,12 +47,20 @@ export default function GoalsScreen() {
     <View style={styles.header}>
       <View style={styles.titleRow}>
         <Text style={styles.titleText}>MY GOALS</Text>
-        <Pressable
-          onPress={() => router.push("/(app)/goals/create")}
-          hitSlop={12}
-        >
-          <Ionicons name="add-circle-outline" size={28} color={Colors.amber[500]} />
-        </Pressable>
+        <View style={styles.headerActions}>
+          <Pressable
+            onPress={() => router.push("/(app)/calendar")}
+            hitSlop={12}
+          >
+            <Ionicons name="calendar-outline" size={26} color={Colors.neutral[400]} />
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/(app)/goals/create")}
+            hitSlop={12}
+          >
+            <Ionicons name="add-circle-outline" size={28} color={Colors.amber[500]} />
+          </Pressable>
+        </View>
       </View>
       <Text style={styles.dateText}>{dateLabel}</Text>
     </View>
@@ -149,6 +157,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.md,
   },
   titleText: {
     ...Typography.display.sm,

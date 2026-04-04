@@ -10,8 +10,18 @@ export interface CreateGoalBody {
 }
 
 export interface LogProgressBody {
+  date: string;
   value: number;
-  date?: string;
+  required: number;
+  missed: boolean;
+}
+
+export interface UpdateGoalStateBody {
+  status: string;
+  cumulativeTotal: number;
+  totalDebt: number;
+  nextDayMultiplier: number;
+  streak: number;
 }
 
 export function createGoalsApi(client: ApiClient) {
@@ -25,8 +35,11 @@ export function createGoalsApi(client: ApiClient) {
     create(body: CreateGoalBody): Promise<Goal> {
       return client.post<Goal>("/api/goals", body);
     },
-    logProgress(id: string, body: LogProgressBody): Promise<Goal> {
-      return client.post<Goal>(`/api/goals/${id}/log`, body);
+    logProgress(id: string, body: LogProgressBody): Promise<unknown> {
+      return client.post<unknown>(`/api/goals/${id}/logs`, body);
+    },
+    updateState(id: string, body: UpdateGoalStateBody): Promise<Goal> {
+      return client.patch<Goal>(`/api/goals/${id}`, body);
     },
     delete(id: string): Promise<void> {
       return client.delete<void>(`/api/goals/${id}`);

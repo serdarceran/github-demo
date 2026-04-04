@@ -16,6 +16,50 @@ async function resolveUserId(req: NextRequest): Promise<string | null> {
   return mobile?.userId ?? null;
 }
 
+function toGoal(g: any) {
+  return {
+    id: g.id,
+    name: g.name,
+    unit: g.unit,
+    dailyTarget: g.dailyTarget,
+    difficulty: g.difficulty,
+    badgeName: g.badgeName,
+    startDate: g.startDate,
+    endDate: g.endDate,
+    status: g.status,
+    cumulativeTotal: g.cumulativeTotal,
+    totalDebt: g.totalDebt,
+    nextDayMultiplier: g.nextDayMultiplier,
+    streak: g.streak,
+    createdAt: g.createdAt.toISOString(),
+    logs: (g.logs ?? []).map((l: any) => ({
+      date: l.date,
+      value: l.value,
+      required: l.required,
+      missed: l.missed,
+    })),
+  };
+}
+
+// GET /api/goals/:id
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const userId = await resolveUserId(req);
+  const { id } = params;
+
+  const goal = await prisma.goal.findUnique({
+    where: { id },
+    include: { logs: { orderBy: { date: "asc" } } },
+  });
+
+  if (!goal) return NextResponse.json({ error: "Not found" }, { status: 404, headers: corsHeaders });
+
+  if (userId && goal.userId !== userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403, headers: corsHeaders });
+  }
+
+  return NextResponse.json(toGoal(goal), { headers: corsHeaders });
+}
+
 // PATCH /api/goals/:id
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const userId = await resolveUserId(req);

@@ -46,13 +46,17 @@ export default function DayDetailModal({ summary, onClose, onLog }: Props) {
 
   return (
     <div
-      className="t-day-modal-backdrop fixed inset-0 bg-gray-900/50 z-50 flex items-end sm:items-center justify-center p-4"
+      className="t-day-modal-backdrop fixed inset-0 bg-gray-900/60 z-50 flex items-end sm:items-center justify-center sm:p-4"
       onClick={onClose}
     >
       <div
-        className="t-day-modal-card bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-xl"
+        className="t-day-modal-card bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[85vh] sm:max-h-[80vh] flex flex-col shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Drag handle — mobile only */}
+        <div className="t-day-modal-handle sm:hidden flex justify-center pt-3 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
+        </div>
         {/* Header */}
         <div className="t-day-modal-header flex items-start justify-between px-5 pt-5 pb-4 border-b border-gray-100 shrink-0">
           <div className="t-day-modal-header-text">
@@ -132,11 +136,11 @@ export default function DayDetailModal({ summary, onClose, onLog }: Props) {
                         setInputs((prev) => ({ ...prev, [entry.goal.id]: e.target.value }))
                       }
                       placeholder={`Add ${entry.goal.unit}…`}
-                      className="t-day-modal-log-input flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      className="t-day-modal-log-input flex-1 border border-gray-300 rounded-lg px-3 py-2.5 sm:py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 min-h-[44px]"
                     />
                     <button
                       onClick={() => handleLog(entry.goal.id)}
-                      className="t-day-modal-log-btn bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                      className="t-day-modal-log-btn bg-sky-600 hover:bg-sky-700 active:bg-sky-700 text-white px-4 py-2.5 sm:py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
                     >
                       {entry.log ? "Add" : "Log"}
                     </button>

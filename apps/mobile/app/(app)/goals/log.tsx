@@ -12,6 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { createGoalsApi } from '@goal-tracker/api-client';
 import type { Goal } from '@goal-tracker/types';
+import { applyDailyLog, addToDateLog, today as getToday } from '@goal-tracker/core';
 import { useApiClient } from '../../../stores/authStore';
 import { PrimaryButton, InputField } from '../../../components/ui';
 import { Colors, Typography, Spacing, BorderRadius } from '../../../constants/theme';
@@ -29,13 +30,35 @@ export default function LogProgressScreen() {
     enabled: !!goalId,
   });
 
-  const today = new Date().toISOString().split('T')[0];
-  const todayLog = goal?.logs.find((l) => l.date === today);
+  const todayLog = goal?.logs.find((l) => l.date === getToday());
   const requiredAmount = todayLog?.required ?? (goal ? goal.dailyTarget * goal.nextDayMultiplier : 0);
 
   const mutation = useMutation({
-    mutationFn: (value: number) =>
-      createGoalsApi(client).logProgress(goalId, { value }),
+    mutationFn: async (value: number) => {
+      if (!goal) throw new Error('Goal not loaded');
+      const date = getToday();
+      const api = createGoalsApi(client);
+      const alreadyLogged = goal.logs.some((l) => l.date === date);
+      const updated = alreadyLogged
+        ? addToDateLog(goal, value, date)
+        : applyDailyLog(goal, value, date);
+      const log = updated.logs.find((l) => l.date === date)!;
+      await Promise.all([
+        api.logProgress(goalId, {
+          date: log.date,
+          value: log.value,
+          required: log.required,
+          missed: log.missed,
+        }),
+        api.updateState(goalId, {
+          status: updated.status,
+          cumulativeTotal: updated.cumulativeTotal,
+          totalDebt: updated.totalDebt,
+          nextDayMultiplier: updated.nextDayMultiplier,
+          streak: updated.streak,
+        }),
+      ]);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
       queryClient.invalidateQueries({ queryKey: ['goal', goalId] });

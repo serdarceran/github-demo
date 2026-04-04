@@ -29,12 +29,12 @@ export default function Calendar({
   const grid = buildCalendarGrid(year, month);
 
   return (
-    <div className="t-calendar bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
+    <div className="t-calendar bg-white sm:rounded-2xl sm:border sm:border-gray-200 sm:p-6">
       {/* Month navigation */}
-      <div className="t-calendar-nav flex items-center justify-between mb-5">
+      <div className="t-calendar-nav flex items-center justify-between px-4 sm:px-0 py-3 sm:py-0 sm:mb-5">
         <button
           onClick={onPrevMonth}
-          className="t-calendar-prev-btn p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          className="t-calendar-prev-btn p-3 sm:p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 active:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Previous month"
         >
           <svg
@@ -48,13 +48,13 @@ export default function Calendar({
           </svg>
         </button>
 
-        <h2 className="t-calendar-month-label font-bold text-gray-900 text-lg">
+        <h2 className="t-calendar-month-label font-bold text-gray-900 text-base sm:text-lg">
           {MONTH_NAMES[month]} {year}
         </h2>
 
         <button
           onClick={onNextMonth}
-          className="t-calendar-next-btn p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          className="t-calendar-next-btn p-3 sm:p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 active:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Next month"
         >
           <svg
@@ -70,19 +70,20 @@ export default function Calendar({
       </div>
 
       {/* Weekday headers */}
-      <div className="t-calendar-weekday-headers grid grid-cols-7 mb-1">
+      <div className="t-calendar-weekday-headers grid grid-cols-7 mb-1 px-1 sm:px-0">
         {DAY_NAMES_SHORT.map((name) => (
           <div
             key={name}
             className="t-calendar-weekday-header text-center text-xs font-medium text-gray-400 py-1.5"
           >
-            {name}
+            <span className="hidden sm:inline">{name}</span>
+            <span className="sm:hidden">{name[0]}</span>
           </div>
         ))}
       </div>
 
       {/* Day grid */}
-      <div className="t-calendar-grid grid grid-cols-7 gap-1">
+      <div className="t-calendar-grid grid grid-cols-7 gap-0.5 sm:gap-1 px-1 sm:px-0">
         {grid.map((dateStr, i) => (
           <DayCell
             key={dateStr ?? `pad-${i}`}
@@ -94,11 +95,11 @@ export default function Calendar({
       </div>
 
       {/* Legend */}
-      <div className="t-calendar-legend flex flex-wrap items-center gap-4 mt-5 pt-4 border-t border-gray-100">
+      <div className="t-calendar-legend flex flex-wrap items-center gap-3 sm:gap-4 mt-4 sm:mt-5 pt-4 border-t border-gray-100 px-2 sm:px-0">
         <LegendItem dot="bg-emerald-400" label="All met" />
         <LegendItem dot="bg-amber-400"   label="Partial" />
         <LegendItem dot="bg-red-400"     label="Missed" />
-        <LegendItem dot="bg-gray-300"    label="Future / no goals" />
+        <LegendItem dot="bg-gray-300"    label="Future" />
         <span className="t-calendar-legend-today ml-auto text-xs text-gray-400">
           <span className="inline-block w-3 h-3 rounded-sm ring-2 ring-sky-500 mr-1 align-middle" />
           Today

@@ -48,18 +48,18 @@ export default function CalendarPage() {
   return (
     <>
       <Navbar />
-      <main className="t-calendar-page-main max-w-5xl mx-auto px-4 py-8">
+      <main className="t-calendar-page-main max-w-5xl mx-auto sm:px-4 py-4 sm:py-8">
         {/* Page header */}
-        <div className="t-calendar-page-header flex items-center justify-between mb-6">
+        <div className="t-calendar-page-header flex items-center justify-between mb-4 sm:mb-6 px-4 sm:px-0">
           <div className="t-calendar-page-header-left">
-            <h1 className="t-calendar-page-title text-2xl font-bold text-gray-900">Calendar</h1>
-            <p className="t-calendar-page-subtitle text-gray-500 text-sm mt-0.5">
+            <h1 className="t-calendar-page-title text-xl sm:text-2xl font-bold text-gray-900">Calendar</h1>
+            <p className="t-calendar-page-subtitle text-gray-500 text-xs sm:text-sm mt-0.5">
               Your goal history at a glance
             </p>
           </div>
           <button
             onClick={jumpToToday}
-            className="t-calendar-jump-today-btn bg-sky-50 hover:bg-sky-100 text-sky-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="t-calendar-jump-today-btn bg-sky-50 active:bg-sky-100 hover:bg-sky-100 text-sky-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors min-h-[44px] min-w-[44px]"
           >
             Today
           </button>

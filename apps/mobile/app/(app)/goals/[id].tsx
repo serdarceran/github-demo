@@ -172,7 +172,7 @@ export default function GoalDetailScreen() {
       <View style={styles.stickyBar}>
         <PrimaryButton
           label="LOG TODAY'S PROGRESS"
-          onPress={() => router.push('/(app)/goals/log')}
+          onPress={() => router.push({ pathname: '/(app)/goals/log', params: { goalId: id } })}
           variant="amber"
           fullWidth
         />
@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: Spacing.xl,
     paddingBottom: Spacing.md,
   },
   backButton: {
