@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     where: { userId: user.id },
     include: { role: true },
   });
-  const roles = userRoles.map((ur) => ur.role.name);
+  const roles = userRoles.map((ur: (typeof userRoles)[number]) => ur.role.name);
 
   const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
   const token = await new SignJWT({ id: user.id, email: user.email!, roles })

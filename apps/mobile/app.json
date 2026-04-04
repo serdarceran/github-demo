@@ -5,14 +5,15 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "goaltracker",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#060B18",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.goaltracker.mobile"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#060B18"
       },
       "package": "com.goaltracker.mobile"
     },

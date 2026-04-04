@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
           where: { userId: token.id },
           include: { role: true },
         });
-        token.roles = userRoles.map((ur) => ur.role.name);
+        token.roles = userRoles.map((ur: (typeof userRoles)[number]) => ur.role.name);
       }
       return token;
     },

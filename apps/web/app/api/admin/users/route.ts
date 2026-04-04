@@ -21,12 +21,12 @@ export async function GET() {
   });
 
   return NextResponse.json(
-    users.map((u) => ({
+    users.map((u: (typeof users)[number]) => ({
       id: u.id,
       email: u.email,
       isGuest: u.isGuest,
       createdAt: u.createdAt,
-      roles: u.userRoles.map((ur) => ur.role.name),
+      roles: u.userRoles.map((ur: (typeof u.userRoles)[number]) => ur.role.name),
     }))
   );
 }

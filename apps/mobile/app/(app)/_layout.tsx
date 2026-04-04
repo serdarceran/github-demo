@@ -11,5 +11,9 @@ export default function AppLayout() {
     }
   }, [token, isHydrated]);
 
-  return <Stack />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="goals/log" options={{ presentation: "modal" }} />
+    </Stack>
+  );
 }
