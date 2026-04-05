@@ -14,7 +14,7 @@ A Simple Demo for GitHub
 
 ```bash
 # 1. Start PostgreSQL
-docker-compose up -d
+docker compose up
 
 # 2. Install dependencies
 pnpm install
